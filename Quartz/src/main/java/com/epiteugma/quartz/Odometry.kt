@@ -8,11 +8,11 @@ class Odometry(
     val params: Parameters,
     val left: DcMotor,
     val right: DcMotor,
-    val parallel: DcMotor?
+    val parallel: DcMotor? = null
 ) {
     class Parameters(
         val trackWidth: Int,
-        val parallelOffset: Int?
+        val parallelOffset: Int? = 0
     )
 
     val pose = Vec()

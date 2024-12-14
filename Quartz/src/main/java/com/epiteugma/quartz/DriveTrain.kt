@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor
 class DriveTrain(
     val frontLeft: DcMotor,
     val frontRight: DcMotor,
-    val backLeft: DcMotor?,
-    val backRight: DcMotor?
+    val backLeft: DcMotor? = null,
+    val backRight: DcMotor? = null
 ) {
     fun drive(
         forwardPower: Double,
