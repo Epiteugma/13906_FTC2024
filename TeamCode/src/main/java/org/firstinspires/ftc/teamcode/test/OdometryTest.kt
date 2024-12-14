@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.teamcode.Robot
 import kotlin.math.PI
 
-@Autonomous(name = "Odometry", group = "FTC2024_test")
+@Autonomous(name = "[FTC24:test] Odometry")
 class OdometryTest : LinearOpMode() {
     private lateinit var robot: Robot
     private lateinit var odometry: Odometry
@@ -22,6 +22,8 @@ class OdometryTest : LinearOpMode() {
             this.robot.driveTrain.frontLeft,
             this.robot.driveTrain.frontRight
         )
+
+        waitForStart()
 
         while (opModeIsActive()) {
             this.odometry.update()
