@@ -1,6 +1,27 @@
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 
+apply plugin: 'org.jetbrains.kotlin.android'
+
 android {
     namespace = 'com.epiteugma.quartz'
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+    }
+
+    dependencies {
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0'
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.15.0'
 }
