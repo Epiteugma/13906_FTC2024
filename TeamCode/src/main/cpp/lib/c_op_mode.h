@@ -1,6 +1,8 @@
 #pragma once
 
 #include <jni.h>
+#include "c_hardware_map.h"
+#include "c_gamepad.h"
 
 class C_OpMode {
     JNIEnv *p_jni;
@@ -9,6 +11,10 @@ class C_OpMode {
     jmethodID m_waitForStart;
     jmethodID m_opModeIsActive;
 public:
+    C_HardwareMap *hardwareMap;
+    C_Gamepad *gamepad1;
+    C_Gamepad *gamepad2;
+
     virtual void runOpMode();
     void waitForStart();
     bool opModeIsActive();
