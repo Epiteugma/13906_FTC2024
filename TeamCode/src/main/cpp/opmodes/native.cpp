@@ -13,10 +13,10 @@ void Native::runOpMode() {
         float strafe_power = this->gamepad1->left_stick_x();
         float turn_power = this->gamepad1->right_stick_x();
 
-        front_left->setPower((double) (forward_power - turn_power + strafe_power));
-        front_right->setPower((double) (forward_power + turn_power - strafe_power));
-        back_left->setPower((double) (forward_power - turn_power - strafe_power));
-        back_right->setPower((double) (forward_power + turn_power + strafe_power));
+        front_left->setPower((double) (forward_power + turn_power + strafe_power));
+        front_right->setPower((double) (forward_power - turn_power - strafe_power));
+        back_left->setPower((double) (forward_power + turn_power - strafe_power));
+        back_right->setPower((double) (forward_power - turn_power + strafe_power));
     }
 }
 
