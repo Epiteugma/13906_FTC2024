@@ -1,7 +1,7 @@
 #pragma once
 
 #include <jni.h>
-#include "c_hardware_map.h"
+#include "hardware/c_hardware_map.h"
 #include "c_gamepad.h"
 #include "c_telemetry.h"
 

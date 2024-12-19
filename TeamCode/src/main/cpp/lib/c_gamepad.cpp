@@ -73,3 +73,19 @@ bool C_Gamepad::x() {
 bool C_Gamepad::y() {
     return this->p_jni->GetBooleanField(this->self, this->f_y);
 }
+
+bool C_Gamepad::cross() {
+    return this->a();
+}
+
+bool C_Gamepad::circle() {
+    return this->b();
+}
+
+bool C_Gamepad::square() {
+    return this->x();
+}
+
+bool C_Gamepad::triangle() {
+    return this->y();
+}

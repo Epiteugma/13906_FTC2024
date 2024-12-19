@@ -8,10 +8,14 @@ C_DcMotor::C_DcMotor(JNIEnv *p_jni, jobject self) {
 
     this->c_direction = p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotorSimple$Direction");
     this->c_run_mode = p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotor$RunMode");
+    this->c_zero_power_behavior = p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotor$ZeroPowerBehavior");
 
     this->m_setPower = p_jni->GetMethodID(clazz, "setPower", "(D)V");
     this->m_setDirection = p_jni->GetMethodID(clazz, "setDirection", "(Lcom/qualcomm/robotcore/hardware/DcMotorSimple$Direction;)V");
     this->m_setMode = p_jni->GetMethodID(clazz, "setMode", "(Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;)V");
+    this->m_setZeroPowerBehavior = p_jni->GetMethodID(clazz, "setZeroPowerBehavior", "(Lcom/qualcomm/robotcore/hardware/DcMotor$ZeroPowerBehavior;)V");
+    this->m_setTargetPosition = p_jni->GetMethodID(clazz, "setTargetPosition", "(I)V");
+    this->m_getCurrentPosition = p_jni->GetMethodID(clazz, "getCurrentPosition", "()I");
 }
 
 C_DcMotor::~C_DcMotor() {
@@ -64,4 +68,34 @@ void C_DcMotor::setMode(C_DcMotor::C_RunMode runMode) {
 
     this->p_jni->CallVoidMethod(this->self, this->m_setMode, j_mode);
     this->p_jni->DeleteLocalRef(j_mode);
+}
+
+void C_DcMotor::setZeroPowerBehavior(C_ZeroPowerBehavior zeroPowerBehavior) {
+    std::string fieldName;
+
+    switch (zeroPowerBehavior) {
+        case UNKNOWN:
+            fieldName = "UNKNOWN";
+            break;
+        case BRAKE:
+            fieldName = "BRAKE";
+            break;
+        case FLOAT:
+            fieldName = "FLOAT";
+            break;
+    }
+
+    jfieldID f_zeroPowerBehavior = this->p_jni->GetStaticFieldID(this->c_zero_power_behavior, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotor$ZeroPowerBehavior;");
+    jobject j_zeroPowerBehavior = this->p_jni->GetStaticObjectField(this->c_zero_power_behavior, f_zeroPowerBehavior);
+
+    this->p_jni->CallVoidMethod(this->self, this->m_setZeroPowerBehavior, j_zeroPowerBehavior);
+    this->p_jni->DeleteLocalRef(j_zeroPowerBehavior);
+}
+
+void C_DcMotor::setTargetPosition(int targetPosition) {
+    this->p_jni->CallVoidMethod(this->self, this->m_setTargetPosition, (jint) targetPosition);
+}
+
+int C_DcMotor::getCurrentPosition() {
+    return (int) this->p_jni->CallIntMethod(this->self, this->m_getCurrentPosition);
 }

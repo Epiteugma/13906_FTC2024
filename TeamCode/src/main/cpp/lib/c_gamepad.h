@@ -37,4 +37,10 @@ public:
     bool b();
     bool x();
     bool y();
+
+    // PS controller support
+    bool cross();
+    bool circle();
+    bool square();
+    bool triangle();
 };
