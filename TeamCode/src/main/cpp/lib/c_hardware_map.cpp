@@ -6,7 +6,7 @@ C_HardwareMap::C_HardwareMap(JNIEnv *p_jni, jobject self) {
 
     jclass clazz = p_jni->GetObjectClass(self);
 
-    this->m_get = p_jni->GetMethodID(clazz, "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+    this->m_get = p_jni->GetMethodID(clazz, "get", "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;");
 }
 
 C_DcMotor *C_HardwareMap::getDcMotor(const std::string& name) {
