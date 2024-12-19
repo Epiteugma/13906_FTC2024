@@ -9,6 +9,10 @@ C_Servo::C_Servo(JNIEnv *p_jni, jobject self) {
     this->m_setPosition = p_jni->GetMethodID(clazz, "setPosition", "(D)V");
 }
 
+C_Servo::~C_Servo() {
+    this->p_jni->DeleteLocalRef(this->self);
+}
+
 void C_Servo::setPosition(double position) {
     this->p_jni->CallVoidMethod(this->self, this->m_setPosition, (jdouble) position);
 }

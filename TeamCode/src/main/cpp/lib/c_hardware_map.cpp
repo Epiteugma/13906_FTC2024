@@ -9,6 +9,10 @@ C_HardwareMap::C_HardwareMap(JNIEnv *p_jni, jobject self) {
     this->m_get = p_jni->GetMethodID(clazz, "get", "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Object;");
 }
 
+C_HardwareMap::~C_HardwareMap() {
+    this->p_jni->DeleteLocalRef(this->self);
+};
+
 C_DcMotor *C_HardwareMap::getDcMotor(const std::string& name) {
     jstring j_name = this->p_jni->NewStringUTF(name.c_str());
 

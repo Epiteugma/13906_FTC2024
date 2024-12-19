@@ -22,6 +22,10 @@ C_Gamepad::C_Gamepad(JNIEnv *p_jni, jobject self) {
     this->f_y = p_jni->GetFieldID(clazz, "y", "Z");
 }
 
+C_Gamepad::~C_Gamepad() {
+    this->p_jni->DeleteLocalRef(this->self);
+}
+
 float C_Gamepad::left_stick_x() {
     return this->p_jni->GetFloatField(this->self, this->f_left_stick_x);
 }

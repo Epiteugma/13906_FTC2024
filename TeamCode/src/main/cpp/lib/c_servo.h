@@ -8,6 +8,7 @@ class C_Servo {
     jmethodID m_setPosition;
 public:
     C_Servo(JNIEnv *p_jni, jobject self);
+    ~C_Servo();
 
     void setPosition(double position);
 };

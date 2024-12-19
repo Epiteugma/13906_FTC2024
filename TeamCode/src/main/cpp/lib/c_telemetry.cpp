@@ -10,6 +10,10 @@ C_Telemetry::C_Telemetry(JNIEnv* p_jni, jobject self) {
     this->m_update = p_jni->GetMethodID(clazz, "update", "()Z");
 }
 
+C_Telemetry::~C_Telemetry() {
+    this->p_jni->DeleteLocalRef(this->self);
+}
+
 void C_Telemetry::addLine(const std::string& line) {
     jstring j_line = this->p_jni->NewStringUTF(line.c_str());
 

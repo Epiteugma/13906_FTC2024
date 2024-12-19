@@ -21,6 +21,7 @@ class C_Gamepad {
     jfieldID f_y;
 public:
     C_Gamepad(JNIEnv *p_jni, jobject self);
+    ~C_Gamepad();
 
     float left_stick_x();
     float left_stick_y();

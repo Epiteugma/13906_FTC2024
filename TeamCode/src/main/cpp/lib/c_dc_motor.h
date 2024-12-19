@@ -14,6 +14,7 @@ class C_DcMotor {
     jmethodID m_setMode;
 public:
     C_DcMotor(JNIEnv *p_jni, jobject self);
+    ~C_DcMotor();
 
     enum C_Direction {
         FORWARD,

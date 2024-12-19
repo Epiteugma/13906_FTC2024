@@ -14,6 +14,10 @@ C_DcMotor::C_DcMotor(JNIEnv *p_jni, jobject self) {
     this->m_setMode = p_jni->GetMethodID(clazz, "setMode", "(Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;)V");
 }
 
+C_DcMotor::~C_DcMotor() {
+    this->p_jni->DeleteLocalRef(this->self);
+}
+
 void C_DcMotor::setPower(double power) {
     this->p_jni->CallVoidMethod(this->self, this->m_setPower, (jdouble) power);
 }
@@ -30,8 +34,11 @@ void C_DcMotor::setDirection(C_DcMotor::C_Direction direction) {
             break;
     }
 
-    jfieldID j_dir = this->p_jni->GetStaticFieldID(this->c_direction, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotorSimple$Direction;");
+    jfieldID f_dir = this->p_jni->GetStaticFieldID(this->c_direction, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotorSimple$Direction;");
+    jobject j_dir = this->p_jni->GetStaticObjectField(this->c_direction, f_dir);
+
     this->p_jni->CallVoidMethod(this->self, this->m_setDirection, j_dir);
+    this->p_jni->DeleteLocalRef(j_dir);
 }
 
 void C_DcMotor::setMode(C_DcMotor::C_RunMode runMode) {
@@ -52,6 +59,9 @@ void C_DcMotor::setMode(C_DcMotor::C_RunMode runMode) {
             break;
     }
 
-    jfieldID j_mode = this->p_jni->GetStaticFieldID(this->c_direction, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;");
+    jfieldID f_mode = this->p_jni->GetStaticFieldID(this->c_direction, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;");
+    jobject j_mode = this->p_jni->GetStaticObjectField(this->c_direction, f_mode);
+
     this->p_jni->CallVoidMethod(this->self, this->m_setMode, j_mode);
+    this->p_jni->DeleteLocalRef(j_mode);
 }

@@ -10,6 +10,7 @@ class C_Telemetry {
     jmethodID m_update;
 public:
     C_Telemetry(JNIEnv *p_jni, jobject self);
+    ~C_Telemetry();
 
     void addLine(const std::string& line);
     bool update();
