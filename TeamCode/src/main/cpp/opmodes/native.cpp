@@ -1,10 +1,10 @@
 #include "native.h"
 
 void Native::runOpMode() {
-    auto *front_left = this->hardwareMap->getDcMotor("frontLeft");
-    auto *front_right = this->hardwareMap->getDcMotor("frontRight");
-    auto *back_left = this->hardwareMap->getDcMotor("backLeft");
-    auto *back_right = this->hardwareMap->getDcMotor("backRight");
+    auto *front_left = this->hardwareMap->getDcMotor("front_left");
+    auto *front_right = this->hardwareMap->getDcMotor("front_right");
+    auto *back_left = this->hardwareMap->getDcMotor("back_left");
+    auto *back_right = this->hardwareMap->getDcMotor("back_right");
 
     this->waitForStart();
 
@@ -17,6 +17,9 @@ void Native::runOpMode() {
         front_right->setPower((double) (forward_power - turn_power - strafe_power));
         back_left->setPower((double) (forward_power + turn_power - strafe_power));
         back_right->setPower((double) (forward_power - turn_power + strafe_power));
+
+        this->telemetry->addLine("hello c++!");
+        this->telemetry->update();
     }
 }
 

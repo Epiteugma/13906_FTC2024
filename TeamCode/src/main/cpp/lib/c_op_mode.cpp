@@ -10,6 +10,7 @@ C_OpMode::C_OpMode(JNIEnv *p_jni, jobject self) {
     this->m_waitForStart = p_jni->GetMethodID(clazz, "waitForStart", "()V");
 
     this->hardwareMap = new C_HardwareMap(p_jni, p_jni->GetObjectField(self, p_jni->GetFieldID(clazz, "hardwareMap", "Lcom/qualcomm/robotcore/hardware/HardwareMap;")));
+    this->telemetry = new C_Telemetry(p_jni, p_jni->GetObjectField(self, p_jni->GetFieldID(clazz, "telemetry", "Lorg/firstinspires/ftc/robotcore/external/Telemetry;")));
     this->gamepad1 = new C_Gamepad(p_jni, p_jni->GetObjectField(self, p_jni->GetFieldID(clazz, "gamepad1", "Lcom/qualcomm/robotcore/hardware/Gamepad;")));
     this->gamepad2 = new C_Gamepad(p_jni, p_jni->GetObjectField(self, p_jni->GetFieldID(clazz, "gamepad2", "Lcom/qualcomm/robotcore/hardware/Gamepad;")));
 }
