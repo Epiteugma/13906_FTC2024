@@ -18,14 +18,8 @@
 import java.util.regex.Pattern
 
 apply plugin: 'com.android.application'
-apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
-    compileSdkVersion 30
 
     signingConfigs {
         release {
