@@ -109,11 +109,12 @@ double C_DcMotor::getPower() {
 C_DcMotor::C_Direction C_DcMotor::getDirection() {
     jobject dir = this->p_jni->CallObjectMethod(this->self, this->m_getDirection);
     jmethodID m_name = this->p_jni->GetMethodID(this->c_direction, "name", "()Ljava/lang/String;");
-
     auto j_name = (jstring) this->p_jni->CallObjectMethod(dir, m_name);
-    auto dirName = std::string(this->p_jni->GetStringUTFChars(j_name, (jboolean*) true));
 
-    this->p_jni->DeleteLocalRef(dir);
+    const char *c_str = this->p_jni->GetStringUTFChars(j_name, nullptr);
+    auto dirName = std::string(c_str);
+
+    this->p_jni->ReleaseStringUTFChars(j_name, c_str);
     this->p_jni->DeleteLocalRef(j_name);
 
     if (dirName == "REVERSE") return C_Direction::REVERSE;
@@ -123,12 +124,13 @@ C_DcMotor::C_Direction C_DcMotor::getDirection() {
 C_DcMotor::C_RunMode C_DcMotor::getMode() {
     jobject mode = this->p_jni->CallObjectMethod(this->self, this->m_getMode);
     jmethodID m_name = this->p_jni->GetMethodID(this->c_run_mode, "name", "()Ljava/lang/String;");
-
     auto j_name = (jstring) this->p_jni->CallObjectMethod(mode, m_name);
-    auto modeName = std::string(this->p_jni->GetStringUTFChars(j_name, (jboolean*) true));
 
+    const char *c_str = this->p_jni->GetStringUTFChars(j_name, nullptr);
+    auto modeName = std::string(c_str);
+
+    this->p_jni->ReleaseStringUTFChars(j_name, c_str);
     this->p_jni->DeleteLocalRef(mode);
-    this->p_jni->DeleteLocalRef(j_name);
 
     if (modeName == "RUN_USING_ENCODER") return C_RunMode::RUN_USING_ENCODER;
     else if (modeName == "RUN_TO_POSITION") return C_RunMode::RUN_TO_POSITION;
@@ -140,12 +142,13 @@ C_DcMotor::C_RunMode C_DcMotor::getMode() {
 C_DcMotor::C_ZeroPowerBehavior C_DcMotor::getZeroPowerBehavior() {
     jobject zeroPowerBehavior = this->p_jni->CallObjectMethod(this->self, this->m_getZeroPowerBehavior);
     jmethodID m_name = this->p_jni->GetMethodID(this->c_zero_power_behavior, "name", "()Ljava/lang/String;");
-
     auto j_name = (jstring) this->p_jni->CallObjectMethod(zeroPowerBehavior, m_name);
-    auto zeroPowerBehaviorName = std::string(this->p_jni->GetStringUTFChars(j_name, (jboolean*) true));
 
+    const char *c_str = this->p_jni->GetStringUTFChars(j_name, nullptr);
+    auto zeroPowerBehaviorName = std::string(c_str);
+
+    this->p_jni->ReleaseStringUTFChars(j_name, c_str);
     this->p_jni->DeleteLocalRef(zeroPowerBehavior);
-    this->p_jni->DeleteLocalRef(j_name);
 
     if (zeroPowerBehaviorName == "BRAKE") return C_ZeroPowerBehavior::BRAKE;
     else if (zeroPowerBehaviorName == "UNKNOWN") return C_ZeroPowerBehavior::UNKNOWN;

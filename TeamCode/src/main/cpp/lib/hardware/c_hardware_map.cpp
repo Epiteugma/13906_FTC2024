@@ -19,11 +19,6 @@ C_DcMotor *C_HardwareMap::getDcMotor(const std::string& name) {
     auto *motor = new C_DcMotor(this->p_jni, this->p_jni->CallObjectMethod(this->self, this->m_get, this->p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotor"), j_name));
     this->p_jni->DeleteLocalRef(j_name);
 
-    if (this->p_jni->ExceptionCheck()) {
-        this->p_jni->ExceptionClear();
-        return nullptr;
-    }
-
     return motor;
 }
 
@@ -32,11 +27,6 @@ C_Servo *C_HardwareMap::getServo(const std::string& name) {
 
     auto* servo = new C_Servo(this->p_jni, this->p_jni->CallObjectMethod(this->self, this->m_get, this->p_jni->FindClass("com/qualcomm/robotcore/hardware/Servo"), j_name));
     this->p_jni->DeleteLocalRef(j_name);
-
-    if (this->p_jni->ExceptionCheck()) {
-        this->p_jni->ExceptionClear();
-        return nullptr;
-    }
 
     return servo;
 }

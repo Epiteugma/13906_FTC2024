@@ -11,6 +11,8 @@ add_library(teamcode SHARED
         lib/hardware/c_dc_motor.cpp
         lib/hardware/c_servo.cpp
 
+        utils/drivetrain.cpp
+
         opmodes/drive.cpp
 )
 
