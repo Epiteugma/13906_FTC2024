@@ -15,6 +15,12 @@ C_DcMotor::C_DcMotor(JNIEnv *p_jni, jobject self) {
     this->m_setMode = p_jni->GetMethodID(clazz, "setMode", "(Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;)V");
     this->m_setZeroPowerBehavior = p_jni->GetMethodID(clazz, "setZeroPowerBehavior", "(Lcom/qualcomm/robotcore/hardware/DcMotor$ZeroPowerBehavior;)V");
     this->m_setTargetPosition = p_jni->GetMethodID(clazz, "setTargetPosition", "(I)V");
+
+    this->m_getPower = p_jni->GetMethodID(clazz, "getPower", "()D");
+    this->m_getDirection = p_jni->GetMethodID(clazz, "getDirection", "()Lcom/qualcomm/robotcore/hardware/DcMotorSimple$Direction;");
+    this->m_getMode = p_jni->GetMethodID(clazz, "getMode", "()Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;");
+    this->m_getZeroPowerBehavior = p_jni->GetMethodID(clazz, "getZeroPowerBehavior", "()Lcom/qualcomm/robotcore/hardware/DcMotor$ZeroPowerBehavior;");
+    this->m_getTargetPosition = p_jni->GetMethodID(clazz, "getTargetPosition", "()I");
     this->m_getCurrentPosition = p_jni->GetMethodID(clazz, "getCurrentPosition", "()I");
 }
 
@@ -94,6 +100,61 @@ void C_DcMotor::setZeroPowerBehavior(C_ZeroPowerBehavior zeroPowerBehavior) {
 
 void C_DcMotor::setTargetPosition(int targetPosition) {
     this->p_jni->CallVoidMethod(this->self, this->m_setTargetPosition, (jint) targetPosition);
+}
+
+double C_DcMotor::getPower() {
+    return (double) this->p_jni->CallDoubleMethod(this->self, this->m_getPower);
+}
+
+C_DcMotor::C_Direction C_DcMotor::getDirection() {
+    jobject dir = this->p_jni->CallObjectMethod(this->self, this->m_getDirection);
+    jmethodID m_name = this->p_jni->GetMethodID(this->c_direction, "name", "()Ljava/lang/String;");
+
+    auto j_name = (jstring) this->p_jni->CallObjectMethod(dir, m_name);
+    auto dirName = std::string(this->p_jni->GetStringUTFChars(j_name, (jboolean*) true));
+
+    this->p_jni->DeleteLocalRef(dir);
+    this->p_jni->DeleteLocalRef(j_name);
+
+    if (dirName == "REVERSE") return C_Direction::REVERSE;
+    return C_Direction::FORWARD;
+}
+
+C_DcMotor::C_RunMode C_DcMotor::getMode() {
+    jobject mode = this->p_jni->CallObjectMethod(this->self, this->m_getMode);
+    jmethodID m_name = this->p_jni->GetMethodID(this->c_run_mode, "name", "()Ljava/lang/String;");
+
+    auto j_name = (jstring) this->p_jni->CallObjectMethod(mode, m_name);
+    auto modeName = std::string(this->p_jni->GetStringUTFChars(j_name, (jboolean*) true));
+
+    this->p_jni->DeleteLocalRef(mode);
+    this->p_jni->DeleteLocalRef(j_name);
+
+    if (modeName == "RUN_USING_ENCODER") return C_RunMode::RUN_USING_ENCODER;
+    else if (modeName == "RUN_TO_POSITION") return C_RunMode::RUN_TO_POSITION;
+    else if (modeName == "STOP_AND_RESET_ENCODER") return C_RunMode::STOP_AND_RESET_ENCODER;
+
+    return C_RunMode::RUN_WITHOUT_ENCODER;
+}
+
+C_DcMotor::C_ZeroPowerBehavior C_DcMotor::getZeroPowerBehavior() {
+    jobject zeroPowerBehavior = this->p_jni->CallObjectMethod(this->self, this->m_getZeroPowerBehavior);
+    jmethodID m_name = this->p_jni->GetMethodID(this->c_zero_power_behavior, "name", "()Ljava/lang/String;");
+
+    auto j_name = (jstring) this->p_jni->CallObjectMethod(zeroPowerBehavior, m_name);
+    auto zeroPowerBehaviorName = std::string(this->p_jni->GetStringUTFChars(j_name, (jboolean*) true));
+
+    this->p_jni->DeleteLocalRef(zeroPowerBehavior);
+    this->p_jni->DeleteLocalRef(j_name);
+
+    if (zeroPowerBehaviorName == "BRAKE") return C_ZeroPowerBehavior::BRAKE;
+    else if (zeroPowerBehaviorName == "UNKNOWN") return C_ZeroPowerBehavior::UNKNOWN;
+
+    return C_ZeroPowerBehavior::FLOAT;
+}
+
+int C_DcMotor::getTargetPosition() {
+    return (int) this->p_jni->CallIntMethod(this->self, this->m_getTargetPosition);
 }
 
 int C_DcMotor::getCurrentPosition() {

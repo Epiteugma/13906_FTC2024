@@ -15,6 +15,12 @@ class C_DcMotor {
     jmethodID m_setMode;
     jmethodID m_setZeroPowerBehavior;
     jmethodID m_setTargetPosition;
+
+    jmethodID m_getPower;
+    jmethodID m_getDirection;
+    jmethodID m_getMode;
+    jmethodID m_getZeroPowerBehavior;
+    jmethodID m_getTargetPosition;
     jmethodID m_getCurrentPosition;
 public:
     C_DcMotor(JNIEnv *p_jni, jobject self);
@@ -43,5 +49,11 @@ public:
     void setMode(C_RunMode runMode);
     void setZeroPowerBehavior(C_ZeroPowerBehavior zeroPowerBehavior);
     void setTargetPosition(int targetPosition);
+
+    double getPower();
+    C_Direction getDirection();
+    C_RunMode getMode();
+    C_ZeroPowerBehavior getZeroPowerBehavior();
+    int getTargetPosition();
     int getCurrentPosition();
 };

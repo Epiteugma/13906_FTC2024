@@ -7,11 +7,13 @@ class C_Telemetry {
     jobject self;
 
     jmethodID m_addLine;
+    jmethodID m_addLineEmpty;
     jmethodID m_update;
 public:
     C_Telemetry(JNIEnv *p_jni, jobject self);
     ~C_Telemetry();
 
     void addLine(const std::string& line);
+    void addLine();
     bool update();
 };

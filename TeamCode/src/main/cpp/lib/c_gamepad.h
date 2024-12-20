@@ -9,6 +9,8 @@ class C_Gamepad {
     jfieldID f_left_stick_y;
     jfieldID f_right_stick_x;
     jfieldID f_right_stick_y;
+    jfieldID f_left_stick_button;
+    jfieldID f_right_stick_button;
 
     jfieldID f_dpad_down;
     jfieldID f_dpad_up;
@@ -19,6 +21,11 @@ class C_Gamepad {
     jfieldID f_b;
     jfieldID f_x;
     jfieldID f_y;
+
+    jfieldID f_left_bumper;
+    jfieldID f_left_trigger;
+    jfieldID f_right_bumper;
+    jfieldID f_right_trigger;
 public:
     C_Gamepad(JNIEnv *p_jni, jobject self);
     ~C_Gamepad();
@@ -27,6 +34,8 @@ public:
     float left_stick_y();
     float right_stick_x();
     float right_stick_y();
+    bool left_stick_button();
+    bool right_stick_button();
 
     bool dpad_down();
     bool dpad_up();
@@ -43,4 +52,9 @@ public:
     bool circle();
     bool square();
     bool triangle();
+
+    bool left_bumper();
+    float left_trigger();
+    bool right_bumper();
+    float right_trigger();
 };
