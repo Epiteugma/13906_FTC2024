@@ -19,6 +19,8 @@ void Drive::runOpMode() {
     drivetrain.front_right->setDirection(C_DcMotor::C_Direction::REVERSE);
     drivetrain.back_right->setDirection(C_DcMotor::C_Direction::REVERSE);
 
+    auto lift = this->hardwareMap->getDcMotor("lift");
+
     auto rotate_servo = this->hardwareMap->getServo("rotate");
     auto extend_servo = this->hardwareMap->getServo("extend");
     auto pickup_servo = this->hardwareMap->getServo("pickup");
@@ -48,6 +50,19 @@ void Drive::runOpMode() {
             pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
         } else if (this->gamepad1->y()) {
             pickup_servo->setPosition(PICKUP_SERVO_OPEN);
+        }
+
+        float lift_power = -this->gamepad2->left_stick_y();
+
+        if (lift_power == 0.0) {
+            if (lift->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
+                lift->setTargetPosition(lift->getCurrentPosition());
+            }
+
+            lift->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+        } else {
+            lift->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+            lift->setPower(lift_power);
         }
     }
 }
