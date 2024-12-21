@@ -8,3 +8,5 @@
 
 #define PICKUP_SERVO_CLOSED 0.0
 #define PICKUP_SERVO_OPEN   0.4
+
+#define LIFT_HOLD_POWER 0.5

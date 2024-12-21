@@ -60,6 +60,7 @@ void Drive::runOpMode() {
             }
 
             lift->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+            lift->setPower(LIFT_HOLD_POWER);
         } else {
             lift->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
             lift->setPower(lift_power);
