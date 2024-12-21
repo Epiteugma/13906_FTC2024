@@ -14,6 +14,7 @@ add_library(teamcode SHARED
         utils/drivetrain.cpp
 
         opmodes/drive.cpp
+        opmodes/servo_tuner.cpp
 )
 
 target_link_libraries(teamcode

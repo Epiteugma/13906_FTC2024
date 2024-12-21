@@ -1,5 +1,6 @@
 #include "drive.h"
 #include "../utils/drivetrain.h"
+#include "../utils/constants.h"
 
 extern "C"
 JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_Drive_runOpMode(JNIEnv *p_jni, jobject self) {
@@ -18,11 +19,15 @@ void Drive::runOpMode() {
     drivetrain.front_right->setDirection(C_DcMotor::C_Direction::REVERSE);
     drivetrain.back_right->setDirection(C_DcMotor::C_Direction::REVERSE);
 
-    auto *rotate_servo = this->hardwareMap->getServo("rotate");
-    auto *extend_servo = this->hardwareMap->getServo("extend");
-    auto *pickup_servo = this->hardwareMap->getServo("pickup");
+    auto rotate_servo = this->hardwareMap->getServo("rotate");
+    auto extend_servo = this->hardwareMap->getServo("extend");
+    auto pickup_servo = this->hardwareMap->getServo("pickup");
 
     this->waitForStart();
+
+    rotate_servo->setPosition(ROTATE_SERVO_UP);
+    extend_servo->setPosition(EXTEND_SERVO_RETRACTED);
+    pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
 
     while (this->opModeIsActive()) {
         drivetrain.drive(
@@ -31,14 +36,18 @@ void Drive::runOpMode() {
             this->gamepad1->right_stick_x()
         );
 
+        if (this->gamepad1->dpad_up()) {
+            rotate_servo->setPosition(ROTATE_SERVO_DOWN);
+            extend_servo->setPosition(EXTEND_SERVO_EXTENDED);
+        } else if (this->gamepad1->dpad_down()) {
+            rotate_servo->setPosition(ROTATE_SERVO_UP);
+            extend_servo->setPosition(EXTEND_SERVO_RETRACTED);
+        }
+
         if (this->gamepad1->a()) {
-            //rotate_servo->setPosition(0.85);
-            //extend_servo->setPosition(0.7);
-            //pickup_servo->setPosition(1.0);
-        } else if (this->gamepad1->b()) {
-            //rotate_servo->setPosition(0.1);
-            //extend_servo->setPosition(0.0);
-            //pickup_servo->setPosition(0.0);
+            pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
+        } else if (this->gamepad1->y()) {
+            pickup_servo->setPosition(PICKUP_SERVO_OPEN);
         }
     }
 }

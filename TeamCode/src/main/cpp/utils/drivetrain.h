@@ -1,3 +1,4 @@
+#pragma once
 #include "../lib/hardware/c_dc_motor.h"
 
 struct Drivetrain {
