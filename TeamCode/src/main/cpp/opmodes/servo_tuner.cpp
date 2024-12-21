@@ -9,7 +9,7 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_ServoTuner_ru
 void ServoTuner::runOpMode() {
     this->waitForStart();
 
-    std::string servo_name = "extend";
+    std::string servo_name = "release";
     double position = 0.0;
 
     auto last = std::chrono::high_resolution_clock::now();

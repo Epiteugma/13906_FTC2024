@@ -69,8 +69,8 @@ void C_DcMotor::setMode(C_DcMotor::C_RunMode runMode) {
             break;
     }
 
-    jfieldID f_mode = this->p_jni->GetStaticFieldID(this->c_direction, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;");
-    jobject j_mode = this->p_jni->GetStaticObjectField(this->c_direction, f_mode);
+    jfieldID f_mode = this->p_jni->GetStaticFieldID(this->c_run_mode, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;");
+    jobject j_mode = this->p_jni->GetStaticObjectField(this->c_run_mode, f_mode);
 
     this->p_jni->CallVoidMethod(this->self, this->m_setMode, j_mode);
     this->p_jni->DeleteLocalRef(j_mode);
@@ -116,6 +116,7 @@ C_DcMotor::C_Direction C_DcMotor::getDirection() {
 
     this->p_jni->ReleaseStringUTFChars(j_name, c_str);
     this->p_jni->DeleteLocalRef(j_name);
+    this->p_jni->DeleteLocalRef(dir);
 
     if (dirName == "REVERSE") return C_Direction::REVERSE;
     return C_Direction::FORWARD;
@@ -130,6 +131,7 @@ C_DcMotor::C_RunMode C_DcMotor::getMode() {
     auto modeName = std::string(c_str);
 
     this->p_jni->ReleaseStringUTFChars(j_name, c_str);
+    this->p_jni->DeleteLocalRef(j_name);
     this->p_jni->DeleteLocalRef(mode);
 
     if (modeName == "RUN_USING_ENCODER") return C_RunMode::RUN_USING_ENCODER;
@@ -148,6 +150,7 @@ C_DcMotor::C_ZeroPowerBehavior C_DcMotor::getZeroPowerBehavior() {
     auto zeroPowerBehaviorName = std::string(c_str);
 
     this->p_jni->ReleaseStringUTFChars(j_name, c_str);
+    this->p_jni->DeleteLocalRef(j_name);
     this->p_jni->DeleteLocalRef(zeroPowerBehavior);
 
     if (zeroPowerBehaviorName == "BRAKE") return C_ZeroPowerBehavior::BRAKE;
