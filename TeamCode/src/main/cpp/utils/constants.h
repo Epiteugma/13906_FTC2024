@@ -1,0 +1,10 @@
+#pragma once
+
+#define EXTEND_SERVO_RETRACTED 0.1
+#define EXTEND_SERVO_EXTENDED  0.7
+
+#define ROTATE_SERVO_UP   0.85
+#define ROTATE_SERVO_DOWN 0.1
+
+#define PICKUP_SERVO_CLOSED 0.0
+#define PICKUP_SERVO_OPEN   0.4
