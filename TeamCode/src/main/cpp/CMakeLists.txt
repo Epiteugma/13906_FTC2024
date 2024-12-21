@@ -12,6 +12,7 @@ add_library(teamcode SHARED
         lib/hardware/c_servo.cpp
 
         utils/drivetrain.cpp
+        utils/maths.cpp
 
         opmodes/drive.cpp
         opmodes/servo_tuner.cpp
