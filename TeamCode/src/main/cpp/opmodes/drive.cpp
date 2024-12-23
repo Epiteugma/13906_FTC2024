@@ -41,7 +41,7 @@ void Drive::runOpMode() {
         );
 
         if (this->gamepad1->square()) {
-            drivetrain.multiplier = 0.5;
+            drivetrain.multiplier = 0.25;
         } else if (this->gamepad1->circle()) {
             drivetrain.multiplier = 1.0;
         }
