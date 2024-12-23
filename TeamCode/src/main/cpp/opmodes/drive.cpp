@@ -33,14 +33,18 @@ void Drive::runOpMode() {
     pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
     basket_servo->setPosition(BASKET_SERVO_COLLECT);
 
-    float drive_mtl = 1.0;
-
     while (this->opModeIsActive()) {
         drivetrain.drive(
-            -this->gamepad1->left_stick_y() * drive_mtl,
-            this->gamepad1->left_stick_x() * drive_mtl,
-            this->gamepad1->right_stick_x() * drive_mtl
+            -this->gamepad1->left_stick_y(),
+            this->gamepad1->left_stick_x() ,
+            this->gamepad1->right_stick_x()
         );
+
+        if (this->gamepad1->square()) {
+            drivetrain.multiplier = 0.5;
+        } else if (this->gamepad1->circle()) {
+            drivetrain.multiplier = 1.0;
+        }
 
         if (this->gamepad2->dpad_up()) {
             rotate_servo->setPosition(ROTATE_SERVO_DOWN);
@@ -49,7 +53,8 @@ void Drive::runOpMode() {
             rotate_servo->setPosition(ROTATE_SERVO_UP);
             extend_servo->setPosition(EXTEND_SERVO_RETRACTED);
         }
-        if(this->gamepad2->dpad_left()){
+
+        if (this->gamepad2->dpad_left()) {
             rotate_servo->setPosition(ROTATE_SERVO_MID);
         }
 
@@ -61,14 +66,8 @@ void Drive::runOpMode() {
 
         if (this->gamepad2->right_bumper()) {
             basket_servo->setPosition(BASKET_SERVO_COLLECT);
-        } else if (this->gamepad2->left_bumper()){
-           basket_servo->setPosition(BASKET_SERVO_SCORE);
-        }
-
-        if (this->gamepad1->square()){
-           drive_mtl = 0.5;
-        } else if (this->gamepad1->circle()){
-            drive_mtl = 1.0;
+        } else if (this->gamepad2->left_bumper()) {
+            basket_servo->setPosition(BASKET_SERVO_SCORE);
         }
 
         float lift_power = -this->gamepad2->left_stick_y();
