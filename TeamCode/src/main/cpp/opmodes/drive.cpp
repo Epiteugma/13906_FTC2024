@@ -24,32 +24,51 @@ void Drive::runOpMode() {
     auto rotate_servo = this->hardwareMap->getServo("rotate");
     auto extend_servo = this->hardwareMap->getServo("extend");
     auto pickup_servo = this->hardwareMap->getServo("pickup");
+    auto basket_servo = this->hardwareMap->getServo("basket");
 
     this->waitForStart();
 
     rotate_servo->setPosition(ROTATE_SERVO_UP);
     extend_servo->setPosition(EXTEND_SERVO_RETRACTED);
     pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
+    basket_servo->setPosition(BASKET_SERVO_COLLECT);
+
+    float drive_mtl = 1.0;
 
     while (this->opModeIsActive()) {
         drivetrain.drive(
-            -this->gamepad1->left_stick_y(),
-            this->gamepad1->left_stick_x(),
-            this->gamepad1->right_stick_x()
+            -this->gamepad1->left_stick_y() * drive_mtl,
+            this->gamepad1->left_stick_x() * drive_mtl,
+            this->gamepad1->right_stick_x() * drive_mtl
         );
 
-        if (this->gamepad1->dpad_up()) {
+        if (this->gamepad2->dpad_up()) {
             rotate_servo->setPosition(ROTATE_SERVO_DOWN);
             extend_servo->setPosition(EXTEND_SERVO_EXTENDED);
-        } else if (this->gamepad1->dpad_down()) {
+        } else if (this->gamepad2->dpad_down()) {
             rotate_servo->setPosition(ROTATE_SERVO_UP);
             extend_servo->setPosition(EXTEND_SERVO_RETRACTED);
         }
+        if(this->gamepad2->dpad_left()){
+            rotate_servo->setPosition(ROTATE_SERVO_MID);
+        }
 
-        if (this->gamepad1->a()) {
+        if (this->gamepad2->a()) {
             pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
-        } else if (this->gamepad1->y()) {
+        } else if (this->gamepad2->y()) {
             pickup_servo->setPosition(PICKUP_SERVO_OPEN);
+        }
+
+        if (this->gamepad2->right_bumper()) {
+            basket_servo->setPosition(BASKET_SERVO_COLLECT);
+        } else if (this->gamepad2->left_bumper()){
+           basket_servo->setPosition(BASKET_SERVO_SCORE);
+        }
+
+        if (this->gamepad1->square()){
+           drive_mtl = 0.5;
+        } else if (this->gamepad1->circle()){
+            drive_mtl = 1.0;
         }
 
         float lift_power = -this->gamepad2->left_stick_y();
@@ -65,5 +84,6 @@ void Drive::runOpMode() {
             lift->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
             lift->setPower(lift_power);
         }
+
     }
 }
