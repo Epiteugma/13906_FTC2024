@@ -1,5 +1,5 @@
 #include "drive.h"
-#include "../utils/drivetrain.h"
+#include "../utils/kinematics/drivetrain.h"
 #include "../utils/constants.h"
 
 extern "C"

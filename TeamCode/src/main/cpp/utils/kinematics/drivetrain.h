@@ -1,5 +1,5 @@
 #pragma once
-#include "../lib/hardware/c_dc_motor.h"
+#include "../../lib/hardware/c_dc_motor.h"
 
 struct Drivetrain {
     C_DcMotor *front_left{};
