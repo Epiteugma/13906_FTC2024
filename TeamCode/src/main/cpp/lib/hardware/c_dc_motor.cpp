@@ -18,6 +18,8 @@ C_DcMotor::C_DcMotor(JNIEnv *p_jni, jobject self) {
     this->m_setTargetPosition = p_jni->GetMethodID(clazz, "setTargetPosition", "(I)V");
     this->m_setVelocity = p_jni->GetMethodID(clazz, "setVelocity", "(D)V");
     this->m_setVelocityWithUnit = p_jni->GetMethodID(clazz, "setVelocity", "(DLorg/firstinspires/ftc/robotcore/external/navigation/AngleUnit;)V");
+    this->m_setVelocityPIDFCoefficients = p_jni->GetMethodID(clazz, "setVelocityPIDFCoefficients", "(DDDD)V");
+    this->m_setPositionPIDFCoefficients = p_jni->GetMethodID(clazz, "setPositionPIDFCoefficients", "(D)V");
 
     this->m_getPower = p_jni->GetMethodID(clazz, "getPower", "()D");
     this->m_getDirection = p_jni->GetMethodID(clazz, "getDirection", "()Lcom/qualcomm/robotcore/hardware/DcMotorSimple$Direction;");
@@ -34,7 +36,7 @@ C_DcMotor::~C_DcMotor() {
 }
 
 void C_DcMotor::setPower(double power) {
-    this->p_jni->CallVoidMethod(this->self, this->m_setPower, (jdouble) power);
+    this->p_jni->CallVoidMethod(this->self, this->m_setPower, power);
 }
 
 void C_DcMotor::setDirection(C_DcMotor::C_Direction direction) {
@@ -104,11 +106,11 @@ void C_DcMotor::setZeroPowerBehavior(C_ZeroPowerBehavior zeroPowerBehavior) {
 }
 
 void C_DcMotor::setTargetPosition(int targetPosition) {
-    this->p_jni->CallVoidMethod(this->self, this->m_setTargetPosition, (jint) targetPosition);
+    this->p_jni->CallVoidMethod(this->self, this->m_setTargetPosition, targetPosition);
 }
 
 void C_DcMotor::setVelocity(double velocity) {
-    p_jni->CallVoidMethod(this->self, this->m_setVelocity, (jdouble) velocity);
+    p_jni->CallVoidMethod(this->self, this->m_setVelocity, velocity);
 }
 
 void C_DcMotor::setVelocity(double velocity, C_AngleUnit unit) {
@@ -126,8 +128,16 @@ void C_DcMotor::setVelocity(double velocity, C_AngleUnit unit) {
     jfieldID f_unit = this->p_jni->GetStaticFieldID(this->c_angle_unit, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;");
     jobject j_unit = this->p_jni->GetStaticObjectField(this->c_angle_unit, f_unit);
 
-    this->p_jni->CallVoidMethod(this->self, this->m_setVelocityWithUnit, (jdouble) velocity, j_unit);
+    this->p_jni->CallVoidMethod(this->self, this->m_setVelocityWithUnit, velocity, j_unit);
     this->p_jni->DeleteLocalRef(j_unit);
+}
+
+void C_DcMotor::setVelocityPIDFCoefficients(double p, double i, double d, double f) {
+    p_jni->CallVoidMethod(this->self, this->m_setVelocityPIDFCoefficients, p, i, d, f);
+}
+
+void C_DcMotor::setPositionPIDFCoefficients(double p) {
+    p_jni->CallVoidMethod(this->self, this->m_setPositionPIDFCoefficients, p);
 }
 
 double C_DcMotor::getPower() {

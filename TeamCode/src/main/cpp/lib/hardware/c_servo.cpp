@@ -17,7 +17,7 @@ C_Servo::~C_Servo() {
 }
 
 void C_Servo::setPosition(double position) {
-    this->p_jni->CallVoidMethod(this->self, this->m_setPosition, (jdouble) position);
+    this->p_jni->CallVoidMethod(this->self, this->m_setPosition, position);
 }
 
 void C_Servo::setDirection(C_Direction direction) {

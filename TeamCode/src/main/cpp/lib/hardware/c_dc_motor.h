@@ -19,6 +19,8 @@ class C_DcMotor {
     jmethodID m_setTargetPosition;
     jmethodID m_setVelocity;
     jmethodID m_setVelocityWithUnit;
+    jmethodID m_setVelocityPIDFCoefficients;
+    jmethodID m_setPositionPIDFCoefficients;
 
     jmethodID m_getPower;
     jmethodID m_getDirection;
@@ -62,6 +64,8 @@ public:
     void setTargetPosition(int targetPosition);
     void setVelocity(double velocity);
     void setVelocity(double velocity, C_AngleUnit unit);
+    void setVelocityPIDFCoefficients(double p, double i, double d, double f);
+    void setPositionPIDFCoefficients(double p);
 
     double getPower();
     C_Direction getDirection();
