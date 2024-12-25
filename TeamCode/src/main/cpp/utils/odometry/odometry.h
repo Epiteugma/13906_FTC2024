@@ -1,6 +1,11 @@
 #pragma once
-#include "../lib/hardware/c_dc_motor.h"
-#include "maths.h"
+#include "../../lib/hardware/c_dc_motor.h"
+#include "../maths.h"
+#include "chrono"
+
+using std::chrono::time_point;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
 
 struct Odometry {
     C_DcMotor *left{};
@@ -11,6 +16,7 @@ struct Odometry {
     float perp_offset = 0.0;
 
     math::vec2 pos{};
+    math::vec2 velocity{};
     double theta = 0.0;
 
     void reset_deltas();
@@ -19,4 +25,5 @@ private:
     int last_left = 0;
     int last_right = 0;
     int last_parallel = 0;
+    time_point<high_resolution_clock> last_update;
 };

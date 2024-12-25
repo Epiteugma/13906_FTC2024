@@ -13,7 +13,7 @@ add_library(teamcode SHARED
 
         utils/kinematics/drivetrain.cpp
         utils/maths.cpp
-        utils/odometry.cpp
+        utils/odometry/odometry.cpp
         utils/control/pid.cpp
 
         opmodes/drive.cpp
