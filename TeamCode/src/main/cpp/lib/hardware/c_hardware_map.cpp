@@ -16,7 +16,7 @@ C_HardwareMap::~C_HardwareMap() {
 C_DcMotor *C_HardwareMap::getDcMotor(const std::string& name) {
     jstring j_name = this->p_jni->NewStringUTF(name.c_str());
 
-    auto *motor = new C_DcMotor(this->p_jni, this->p_jni->CallObjectMethod(this->self, this->m_get, this->p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotor"), j_name));
+    auto *motor = new C_DcMotor(this->p_jni, this->p_jni->CallObjectMethod(this->self, this->m_get, this->p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotorEx"), j_name));
     this->p_jni->DeleteLocalRef(j_name);
 
     return motor;

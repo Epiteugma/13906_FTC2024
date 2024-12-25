@@ -9,12 +9,15 @@ C_DcMotor::C_DcMotor(JNIEnv *p_jni, jobject self) {
     this->c_direction = p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotorSimple$Direction");
     this->c_run_mode = p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotor$RunMode");
     this->c_zero_power_behavior = p_jni->FindClass("com/qualcomm/robotcore/hardware/DcMotor$ZeroPowerBehavior");
+    this->c_angle_unit = p_jni->FindClass("org/firstinspires/ftc/robotcore/external/navigation/AngleUnit");
 
     this->m_setPower = p_jni->GetMethodID(clazz, "setPower", "(D)V");
     this->m_setDirection = p_jni->GetMethodID(clazz, "setDirection", "(Lcom/qualcomm/robotcore/hardware/DcMotorSimple$Direction;)V");
     this->m_setMode = p_jni->GetMethodID(clazz, "setMode", "(Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;)V");
     this->m_setZeroPowerBehavior = p_jni->GetMethodID(clazz, "setZeroPowerBehavior", "(Lcom/qualcomm/robotcore/hardware/DcMotor$ZeroPowerBehavior;)V");
     this->m_setTargetPosition = p_jni->GetMethodID(clazz, "setTargetPosition", "(I)V");
+    this->m_setVelocity = p_jni->GetMethodID(clazz, "setVelocity", "(D)V");
+    this->m_setVelocityWithUnit = p_jni->GetMethodID(clazz, "setVelocity", "(DLorg/firstinspires/ftc/robotcore/external/navigation/AngleUnit;)V");
 
     this->m_getPower = p_jni->GetMethodID(clazz, "getPower", "()D");
     this->m_getDirection = p_jni->GetMethodID(clazz, "getDirection", "()Lcom/qualcomm/robotcore/hardware/DcMotorSimple$Direction;");
@@ -22,6 +25,8 @@ C_DcMotor::C_DcMotor(JNIEnv *p_jni, jobject self) {
     this->m_getZeroPowerBehavior = p_jni->GetMethodID(clazz, "getZeroPowerBehavior", "()Lcom/qualcomm/robotcore/hardware/DcMotor$ZeroPowerBehavior;");
     this->m_getTargetPosition = p_jni->GetMethodID(clazz, "getTargetPosition", "()I");
     this->m_getCurrentPosition = p_jni->GetMethodID(clazz, "getCurrentPosition", "()I");
+    this->m_getVelocity = p_jni->GetMethodID(clazz, "getVelocity", "()D");
+    this->m_getVelocityWithUnit = p_jni->GetMethodID(clazz, "getVelocity", "(Lorg/firstinspires/ftc/robotcore/external/navigation/AngleUnit;)D");
 }
 
 C_DcMotor::~C_DcMotor() {
@@ -102,8 +107,31 @@ void C_DcMotor::setTargetPosition(int targetPosition) {
     this->p_jni->CallVoidMethod(this->self, this->m_setTargetPosition, (jint) targetPosition);
 }
 
+void C_DcMotor::setVelocity(double velocity) {
+    p_jni->CallVoidMethod(this->self, this->m_setVelocity, (jdouble) velocity);
+}
+
+void C_DcMotor::setVelocity(double velocity, C_AngleUnit unit) {
+    std::string fieldName;
+
+    switch (unit) {
+        case RADIANS:
+            fieldName = "RADIANS";
+            break;
+        case DEGREES:
+            fieldName = "DEGREES";
+            break;
+    }
+
+    jfieldID f_unit = this->p_jni->GetStaticFieldID(this->c_angle_unit, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;");
+    jobject j_unit = this->p_jni->GetStaticObjectField(this->c_angle_unit, f_unit);
+
+    this->p_jni->CallVoidMethod(this->self, this->m_setVelocityWithUnit, (jdouble) velocity, j_unit);
+    this->p_jni->DeleteLocalRef(j_unit);
+}
+
 double C_DcMotor::getPower() {
-    return (double) this->p_jni->CallDoubleMethod(this->self, this->m_getPower);
+    return this->p_jni->CallDoubleMethod(this->self, this->m_getPower);
 }
 
 C_DcMotor::C_Direction C_DcMotor::getDirection() {
@@ -160,9 +188,34 @@ C_DcMotor::C_ZeroPowerBehavior C_DcMotor::getZeroPowerBehavior() {
 }
 
 int C_DcMotor::getTargetPosition() {
-    return (int) this->p_jni->CallIntMethod(this->self, this->m_getTargetPosition);
+    return this->p_jni->CallIntMethod(this->self, this->m_getTargetPosition);
 }
 
 int C_DcMotor::getCurrentPosition() {
-    return (int) this->p_jni->CallIntMethod(this->self, this->m_getCurrentPosition);
+    return this->p_jni->CallIntMethod(this->self, this->m_getCurrentPosition);
+}
+
+double C_DcMotor::getVelocity() {
+    return this->p_jni->CallDoubleMethod(this->self, this->m_getVelocity);
+}
+
+double C_DcMotor::getVelocity(C_DcMotor::C_AngleUnit unit) {
+    std::string fieldName;
+
+    switch (unit) {
+        case RADIANS:
+            fieldName = "RADIANS";
+            break;
+        case DEGREES:
+            fieldName = "DEGREES";
+            break;
+    }
+
+    jfieldID f_unit = this->p_jni->GetStaticFieldID(this->c_angle_unit, fieldName.c_str(), "Lcom/qualcomm/robotcore/hardware/DcMotor$RunMode;");
+    jobject j_unit = this->p_jni->GetStaticObjectField(this->c_angle_unit, f_unit);
+
+    double velocity = this->p_jni->CallDoubleMethod(this->self, this->m_getVelocityWithUnit, j_unit);
+    this->p_jni->DeleteLocalRef(j_unit);
+
+    return velocity;
 }

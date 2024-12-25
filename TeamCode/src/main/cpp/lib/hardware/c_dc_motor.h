@@ -1,4 +1,5 @@
 #pragma once
+#include "../c_angleunit.h"
 #include "jni.h"
 #include "string"
 
@@ -9,12 +10,15 @@ class C_DcMotor {
     jclass c_direction;
     jclass c_run_mode;
     jclass c_zero_power_behavior;
+    jclass c_angle_unit;
 
     jmethodID m_setPower;
     jmethodID m_setDirection;
     jmethodID m_setMode;
     jmethodID m_setZeroPowerBehavior;
     jmethodID m_setTargetPosition;
+    jmethodID m_setVelocity;
+    jmethodID m_setVelocityWithUnit;
 
     jmethodID m_getPower;
     jmethodID m_getDirection;
@@ -22,6 +26,8 @@ class C_DcMotor {
     jmethodID m_getZeroPowerBehavior;
     jmethodID m_getTargetPosition;
     jmethodID m_getCurrentPosition;
+    jmethodID m_getVelocity;
+    jmethodID m_getVelocityWithUnit;
 public:
     C_DcMotor(JNIEnv *p_jni, jobject self);
     ~C_DcMotor();
@@ -44,11 +50,18 @@ public:
         FLOAT
     };
 
+    enum C_AngleUnit {
+        RADIANS,
+        DEGREES
+    };
+
     void setPower(double power);
     void setDirection(C_Direction direction);
     void setMode(C_RunMode runMode);
     void setZeroPowerBehavior(C_ZeroPowerBehavior zeroPowerBehavior);
     void setTargetPosition(int targetPosition);
+    void setVelocity(double velocity);
+    void setVelocity(double velocity, C_AngleUnit unit);
 
     double getPower();
     C_Direction getDirection();
@@ -56,4 +69,6 @@ public:
     C_ZeroPowerBehavior getZeroPowerBehavior();
     int getTargetPosition();
     int getCurrentPosition();
+    double getVelocity();
+    double getVelocity(C_AngleUnit unit);
 };
