@@ -7,8 +7,16 @@ struct Odometry {
     C_DcMotor *right{};
     C_DcMotor *parallel{};
 
-    math::vec2 pos{};
-    float theta = 0.0;
+    float track_width = 0.0;
+    float perp_offset = 0.0;
 
-    void update() const;
+    math::vec2 pos{};
+    double theta = 0.0;
+
+    void reset_deltas();
+    void update();
+private:
+    int last_left = 0;
+    int last_right = 0;
+    int last_parallel = 0;
 };
