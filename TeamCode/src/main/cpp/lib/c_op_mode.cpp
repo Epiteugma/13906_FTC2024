@@ -16,7 +16,7 @@ C_OpMode::C_OpMode(JNIEnv *p_jni, jobject self) {
 }
 
 bool C_OpMode::opModeIsActive() {
-    return (bool) this->p_jni->CallBooleanMethod(this->self, this->m_opModeIsActive);
+    return this->p_jni->CallBooleanMethod(this->self, this->m_opModeIsActive);
 }
 
 void C_OpMode::waitForStart() {

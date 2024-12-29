@@ -19,17 +19,20 @@ void Drive::runOpMode() {
     drivetrain.front_right->setDirection(C_DcMotor::C_Direction::REVERSE);
     drivetrain.back_right->setDirection(C_DcMotor::C_Direction::REVERSE);
 
-    auto lift = this->hardwareMap->getDcMotor("lift");
+    auto lift_1 = this->hardwareMap->getDcMotor("lift_1");
+    auto lift_2 = this->hardwareMap->getDcMotor("lift_2");
+    lift_2->setDirection(C_DcMotor::C_Direction::REVERSE);
+
+    auto extend_motor = this->hardwareMap->getDcMotor("extend");
+    extend_motor->setDirection(C_DcMotor::C_Direction::REVERSE);
 
     auto rotate_servo = this->hardwareMap->getServo("rotate");
-    auto extend_servo = this->hardwareMap->getServo("extend");
     auto pickup_servo = this->hardwareMap->getServo("pickup");
     auto basket_servo = this->hardwareMap->getServo("basket");
 
     this->waitForStart();
 
     rotate_servo->setPosition(ROTATE_SERVO_UP);
-    extend_servo->setPosition(EXTEND_SERVO_RETRACTED);
     pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
     basket_servo->setPosition(BASKET_SERVO_COLLECT);
 
@@ -48,10 +51,9 @@ void Drive::runOpMode() {
 
         if (this->gamepad2->dpad_up()) {
             rotate_servo->setPosition(ROTATE_SERVO_DOWN);
-            extend_servo->setPosition(EXTEND_SERVO_EXTENDED);
         } else if (this->gamepad2->dpad_down()) {
             rotate_servo->setPosition(ROTATE_SERVO_UP);
-            extend_servo->setPosition(EXTEND_SERVO_RETRACTED);
+            basket_servo->setPosition(BASKET_SERVO_COLLECT);
         }
 
         if (this->gamepad2->dpad_left()) {
@@ -68,21 +70,46 @@ void Drive::runOpMode() {
             basket_servo->setPosition(BASKET_SERVO_COLLECT);
         } else if (this->gamepad2->left_bumper()) {
             basket_servo->setPosition(BASKET_SERVO_SCORE);
+        } else if (this->gamepad2->dpad_right()) {
+            basket_servo->setPosition(BASKET_SERVO_BALANCE);
         }
 
         float lift_power = -this->gamepad2->left_stick_y();
 
         if (lift_power == 0.0) {
-            if (lift->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
-                lift->setTargetPosition(lift->getCurrentPosition());
+            if (lift_1->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
+                lift_1->setTargetPosition(lift_1->getCurrentPosition());
             }
 
-            lift->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-            lift->setPower(LIFT_HOLD_POWER);
+            if (lift_2->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
+                lift_2->setTargetPosition(lift_2->getCurrentPosition());
+            }
+
+            lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+            lift_1->setPower(LIFT_HOLD_POWER);
+
+            lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+            lift_2->setPower(LIFT_HOLD_POWER);
         } else {
-            lift->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-            lift->setPower(lift_power);
+            lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+            lift_1->setPower(lift_power);
+
+            lift_2->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+            lift_2->setPower(lift_power);
         }
 
+        float extend_power = (this->gamepad2->right_trigger() - this->gamepad2->left_trigger()) * 0.75f;
+
+        if (extend_power == 0.0) {
+            if (extend_motor->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
+                extend_motor->setTargetPosition(extend_motor->getCurrentPosition());
+            }
+
+            extend_motor->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+            extend_motor->setPower(EXTEND_HOLD_POWER);
+        } else {
+            extend_motor->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+            extend_motor->setPower(extend_power);
+        }
     }
 }
