@@ -43,9 +43,9 @@ void Drive::runOpMode() {
             this->gamepad1->right_stick_x()
         );
 
-        if (this->gamepad1->square()) {
+        if (this->gamepad1->left_bumper()) {
             drivetrain.multiplier = 0.25;
-        } else if (this->gamepad1->circle()) {
+        } else if (this->gamepad1->right_bumper()) {
             drivetrain.multiplier = 1.0;
         }
 

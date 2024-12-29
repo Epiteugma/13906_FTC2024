@@ -350,7 +350,7 @@ This is a bug fix only release to address the following four issues.
   * You can determine which type of IMU is in your Control Hub by navigating to the Manage page of the web interface.
   * To learn how to use the new `IMU` interface, see https://ftc-docs.firstinspires.org/programming_resources/imu/imu.html. The `SensorIMU` Blocks sample was also updated to use the new `IMU` interface, and the following Java samples were added:
     * `SensorIMUOrthogonal`
-      * Use this sample if your REV Hub is mounted so that it is parallel or perpendicular to the
+      * Use this sample if your REV Hub is mounted so that it is perp or perpendicular to the
         bottom of your robot.
     * `SensorIMUNonOrthogonal`
       * Use this sample if your REV Hub is mounted to your robot in any other orientation

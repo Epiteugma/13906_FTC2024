@@ -10,7 +10,7 @@ using std::chrono::duration;
 struct Odometry {
     C_DcMotor *left{};
     C_DcMotor *right{};
-    C_DcMotor *parallel{};
+    C_DcMotor *perp{};
 
     float track_width = 0.0;
     float perp_offset = 0.0;
@@ -21,9 +21,9 @@ struct Odometry {
 
     void reset_deltas();
     void update();
-private:
+
     int last_left = 0;
     int last_right = 0;
-    int last_parallel = 0;
-    time_point<high_resolution_clock> last_update;
+    int last_perp = 0;
+    time_point<high_resolution_clock> last_update = high_resolution_clock::now();
 };
