@@ -25,8 +25,8 @@ void Auton::runOpMode() {
         drivetrain.front_right,
         this->hardwareMap->getDcMotor("right_encoder"),
         drivetrain.back_right,
-        static_cast<float>(math::distanceToTicks(17.0, 3.0, 8192)),
-        static_cast<float>(math::distanceToTicks(-11.5, 3.0, 8192))
+        math::distanceToTicks(17.0, 3.0, 8192),
+        math::distanceToTicks(-11.5, 3.0, 8192)
     };
 
     this->waitForStart();

@@ -14,8 +14,8 @@ struct Odometry {
     C_DcMotor *right{};
     C_DcMotor *perp{};
 
-    float track_width = 0.0;
-    float perp_offset = 0.0;
+    double track_width = 0.0;
+    double perp_offset = 0.0;
 
     math::vec2 pos{};
     math::vec2 velocity{};
