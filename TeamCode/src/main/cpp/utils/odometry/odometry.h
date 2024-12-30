@@ -2,6 +2,8 @@
 #include "../../lib/hardware/c_dc_motor.h"
 #include "../maths.h"
 #include "chrono"
+#include "../../lib/c_telemetry.h"
+#include "../utils.h"
 
 using std::chrono::time_point;
 using std::chrono::high_resolution_clock;
@@ -19,7 +21,7 @@ struct Odometry {
     math::vec2 velocity{};
     double theta = 0.0;
 
-    void reset_deltas();
+    void init();
     void update();
 
     int last_left = 0;

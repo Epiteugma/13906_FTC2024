@@ -56,7 +56,7 @@ import java.util.List;
  *                     You can issue a clearBulkCache() call at any time force a fresh bulk-read on the next encoder read.
  *
  * Cache Mode = MANUAL This mode requires the user's code to determine the best time to clear the cached bulk-read data.
- *                     Well organized code will reset the cache once at the beginning of the control cycle, and then immediately read and store all the encoder values.
+ *                     Well organized code will init the cache once at the beginning of the control cycle, and then immediately read and store all the encoder values.
  *                     This approach will produce the shortest cycle times, but it does require the user to manually clear the cache.
  *                     Since NO automatic Bulk-Reads are performed, neglecting to clear the bulk cache will result in the same values being returned
  *                     each time an encoder read is performed.

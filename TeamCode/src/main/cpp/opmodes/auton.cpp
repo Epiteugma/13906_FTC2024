@@ -25,43 +25,27 @@ void Auton::runOpMode() {
         drivetrain.front_right,
         this->hardwareMap->getDcMotor("right_encoder"),
         drivetrain.back_right,
-        static_cast<float>(math::distanceToTicks(15.0, 3.0, 8192)),
-        static_cast<float>(math::distanceToTicks(-15.0, 3.0, 8192))
+        static_cast<float>(math::distanceToTicks(17.0, 3.0, 8192)),
+        static_cast<float>(math::distanceToTicks(-11.5, 3.0, 8192))
     };
 
     this->waitForStart();
-
-    odometry.left->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-    odometry.right->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-    odometry.perp->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-
-    odometry.left->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-    odometry.right->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-    odometry.perp->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-
-    odometry.reset_deltas();
+    odometry.init();
 
     while (this->opModeIsActive()) {
         odometry.update();
 
         this->telemetry->addLine(utils::sprintf(
-            "left = %d; right = %d; perp = %d",
-            odometry.left->getCurrentPosition(),
-            odometry.right->getCurrentPosition(),
-            odometry.perp->getCurrentPosition()
+            "(velocity) x = %.2f; y = %.2f",
+            math::ticksToDistance(odometry.velocity.x, 0.03, 8192), // ms-1
+            math::ticksToDistance(odometry.velocity.y, 0.03, 8192)
         ));
 
         this->telemetry->addLine(utils::sprintf(
-            "track_width = %.2f; perp_offset = %.2f",
-            odometry.track_width,
-            odometry.perp_offset
-        ));
-
-        this->telemetry->addLine(utils::sprintf(
-            "x = %d; y = %d; θ = %.2f",
-            odometry.pos.x,
-            odometry.pos.y,
-            odometry.theta
+            "(position) x = %.2f; y = %.2f; θ = %.2f",
+            math::ticksToDistance(odometry.pos.x, 3.0, 8192),
+            math::ticksToDistance(odometry.pos.y, 3.0, 8192),
+            odometry.theta / M_PI * 180.0
         ));
 
         this->telemetry->update();

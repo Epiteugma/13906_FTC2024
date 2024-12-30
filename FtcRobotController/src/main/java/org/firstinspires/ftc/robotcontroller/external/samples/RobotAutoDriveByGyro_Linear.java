@@ -66,7 +66,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  *
  *  All angles are referenced to the coordinate-frame that is set whenever resetHeading() is called.
  *  In this sample, the heading is reset when the Start button is touched on the Driver Station.
- *  Note: It would be possible to reset the heading after each move, but this would accumulate steering errors.
+ *  Note: It would be possible to init the heading after each move, but this would accumulate steering errors.
  *
  *  The angle of movement/rotation is assumed to be a standardized rotation around the robot Z axis,
  *  which means that a Positive rotation is Counter Clockwise, looking down on the field.
@@ -174,7 +174,7 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
             telemetry.update();
         }
 
-        // Set the encoders for closed loop speed control, and reset the heading.
+        // Set the encoders for closed loop speed control, and init the heading.
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         imu.resetYaw();
@@ -220,7 +220,7 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
     *
     * @param maxDriveSpeed MAX Speed for forward/rev motion (range 0 to +1.0) .
     * @param distance   Distance (in inches) to move from current position.  Negative distance means move backward.
-    * @param heading      Absolute Heading Angle (in Degrees) relative to last gyro reset.
+    * @param heading      Absolute Heading Angle (in Degrees) relative to last gyro init.
     *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
     *                   If a relative angle is required, add/subtract from the current robotHeading.
     */
@@ -283,7 +283,7 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
      *  2) Driver stops the OpMode running.
      *
      * @param maxTurnSpeed Desired MAX speed of turn. (range 0 to +1.0)
-     * @param heading Absolute Heading Angle (in Degrees) relative to last gyro reset.
+     * @param heading Absolute Heading Angle (in Degrees) relative to last gyro init.
      *              0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
      *              If a relative angle is required, add/subtract from current heading.
      */
@@ -320,7 +320,7 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
      *  This function is useful for giving the robot a moment to stabilize its heading between movements.
      *
      * @param maxTurnSpeed      Maximum differential turn speed (range 0 to +1.0)
-     * @param heading    Absolute Heading Angle (in Degrees) relative to last gyro reset.
+     * @param heading    Absolute Heading Angle (in Degrees) relative to last gyro init.
      *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
      *                   If a relative angle is required, add/subtract from current heading.
      * @param holdTime   Length of time (in seconds) to hold the specified heading.
@@ -354,7 +354,7 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
     /**
      * Use a Proportional Controller to determine how much steering correction is required.
      *
-     * @param desiredHeading        The desired absolute heading (relative to last heading reset)
+     * @param desiredHeading        The desired absolute heading (relative to last heading init)
      * @param proportionalGain      Gain factor applied to heading error to obtain turning power.
      * @return                      Turning power needed to get to required heading.
      */

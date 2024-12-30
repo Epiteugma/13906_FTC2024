@@ -17,6 +17,8 @@ add_library(teamcode SHARED
         utils/control/pid.cpp
         utils/utils.cpp
 
+        opmodes/test/odometry_test.cpp
+
         opmodes/drive.cpp
         opmodes/servo_tuner.cpp
         opmodes/auton.cpp

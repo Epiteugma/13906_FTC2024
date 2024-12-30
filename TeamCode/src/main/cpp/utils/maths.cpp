@@ -1,16 +1,17 @@
 #include "maths.h"
 
-math::mat2 math::rotationMatrix(double theta) {
-    return {
-        std::cos(theta), -std::sin(theta),
-        std::sin(theta), std::cos(theta)
-    };
+void math::vec2::rotate(double theta) {
+    double old_x = this->x;
+    double old_y = this->y;
+
+    this->x = std::cos(theta) * old_x - std::sin(theta) * old_y;
+    this->y = std::sin(theta) * old_x + std::cos(theta) * old_y;
 }
 
-double math::ticksToDistance(int ticks, double wheelRadius, int ticksPerRev) {
+double math::ticksToDistance(double ticks, double wheelRadius, int ticksPerRev) {
     return (double) ticks / (double) ticksPerRev * (2 * M_PI * wheelRadius);
 }
 
-int math::distanceToTicks(double distance, double wheelRadius, int ticksPerRev) {
+double math::distanceToTicks(double distance, double wheelRadius, int ticksPerRev) {
     return (int) (distance / (2 * M_PI * wheelRadius) * ticksPerRev);
 }

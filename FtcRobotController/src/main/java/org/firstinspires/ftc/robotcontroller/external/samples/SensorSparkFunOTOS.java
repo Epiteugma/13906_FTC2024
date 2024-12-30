@@ -58,7 +58,7 @@ public class SensorSparkFunOTOS extends LinearOpMode {
             }
 
             // Inform user of available controls
-            telemetry.addLine("Press Y (triangle) on Gamepad to reset tracking");
+            telemetry.addLine("Press Y (triangle) on Gamepad to init tracking");
             telemetry.addLine("Press X (square) on Gamepad to calibrate the IMU");
             telemetry.addLine();
 

@@ -49,7 +49,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  *   Roll value should INCREASE as the robot is tipped UP at the left side. (Rotation about Y) <br>
  *   Yaw value should INCREASE as the robot is rotated Counter Clockwise. (Rotation about Z) <br>
  *
- * The yaw can be reset (to zero) by pressing the Y button on the gamepad (Triangle on a PS4 controller)
+ * The yaw can be init (to zero) by pressing the Y button on the gamepad (Triangle on a PS4 controller)
  *
  * This specific sample assumes that the Hub is mounted on one of the three orthogonal planes
  * (X/Y, X/Z or Y/Z) and that the Hub has only been rotated in a range of 90 degree increments.
@@ -122,12 +122,12 @@ public class SensorIMUOrthogonal extends LinearOpMode
 
             telemetry.addData("Hub orientation", "Logo=%s   USB=%s\n ", logoDirection, usbDirection);
 
-            // Check to see if heading reset is requested
+            // Check to see if heading init is requested
             if (gamepad1.y) {
                 telemetry.addData("Yaw", "Resetting\n");
                 imu.resetYaw();
             } else {
-                telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to reset\n");
+                telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to init\n");
             }
 
             // Retrieve Rotational Angles and Velocities
