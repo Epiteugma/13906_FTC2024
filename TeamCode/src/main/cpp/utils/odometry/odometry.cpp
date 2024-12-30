@@ -13,11 +13,11 @@ void Odometry::update() {
     this->last_perp += delta_perp;
     this->last_update = now;
 
-    double phi = (double) (delta_right - delta_left) / this->track_width;
+    double phi = (delta_right - delta_left) / this->track_width;
 
     math::vec2 vec{
-        (double) delta_perp + (phi * this->perp_offset),
-        (double) (delta_right + delta_left) / 2.0,
+        delta_perp + (phi * this->perp_offset),
+        (delta_right + delta_left) / 2.0,
     };
 
     vec.rotate(this->theta);
