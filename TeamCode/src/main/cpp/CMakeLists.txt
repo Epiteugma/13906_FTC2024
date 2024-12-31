@@ -15,9 +15,8 @@ add_library(teamcode SHARED
         utils/maths.cpp
         utils/odometry/odometry.cpp
         utils/control/pid.cpp
+        utils/profiles/profiles.cpp
         utils/utils.cpp
-
-        opmodes/test/odometry_test.cpp
 
         opmodes/drive.cpp
         opmodes/servo_tuner.cpp

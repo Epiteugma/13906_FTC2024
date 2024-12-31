@@ -1,7 +1,5 @@
 #include "auton.h"
-#include "../utils/kinematics/drivetrain.h"
-#include "../utils/odometry/odometry.h"
-#include "../utils/utils.h"
+#include "../utils/profiles/profiles.h"
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -9,45 +7,78 @@ Java_org_firstinspires_ftc_teamcode_opmodes_Auton_runOpMode(JNIEnv *p_jni, jobje
     (new Auton(p_jni, self))->runOpMode();
 }
 
+void Auton::printDebugInfo() {
+    this->telemetry->addLine(utils::sprintf(
+            "(velocity) x = %.2f; y = %.2f",
+            odometry.velocity.x / (ODOMETRY_TICKS_PER_CM * 100.0), // ms-1
+            odometry.velocity.y / (ODOMETRY_TICKS_PER_CM * 100.0)
+    ));
+
+    this->telemetry->addLine(utils::sprintf(
+            "(position) x = %.2f; y = %.2f; θ = %.2f",
+            odometry.pos.x / ODOMETRY_TICKS_PER_CM,
+            odometry.pos.y / ODOMETRY_TICKS_PER_CM,
+            odometry.theta / M_PI * 180.0
+    ));
+
+    this->telemetry->addLine(utils::sprintf("forward power = %.2f", this->forward_power));
+
+    this->telemetry->update();
+}
+
 void Auton::runOpMode() {
-    Drivetrain drivetrain{
+    this->drivetrain = {
         this->hardwareMap->getDcMotor("front_left"),
         this->hardwareMap->getDcMotor("front_right"),
         this->hardwareMap->getDcMotor("back_left"),
         this->hardwareMap->getDcMotor("back_right")
     };
 
-    drivetrain.front_left->setDirection(C_DcMotor::C_Direction::REVERSE);
-    drivetrain.front_right->setDirection(C_DcMotor::C_Direction::REVERSE);
-    drivetrain.back_right->setDirection(C_DcMotor::C_Direction::REVERSE);
+    this->drivetrain.front_left->setDirection(C_DcMotor::C_Direction::REVERSE);
+    this->drivetrain.front_right->setDirection(C_DcMotor::C_Direction::REVERSE);
+    this->drivetrain.back_right->setDirection(C_DcMotor::C_Direction::REVERSE);
 
-    Odometry odometry{
-        drivetrain.front_right,
+    this->odometry = {
+        this->drivetrain.back_left,
         this->hardwareMap->getDcMotor("right_encoder"),
         drivetrain.back_right,
-        math::distanceToTicks(17.0, 3.0, 8192),
-        math::distanceToTicks(-11.5, 3.0, 8192)
+        16.0 * ODOMETRY_TICKS_PER_CM,
+        12.5 * ODOMETRY_TICKS_PER_CM
     };
 
     this->waitForStart();
-    odometry.init();
+    this->odometry.init();
+
+    auto start = high_resolution_clock::now();
+
+    double max_velocity = 0.0;
+    double time_to_max_velocity = 0.0;
+
+    bool complete = false;
 
     while (this->opModeIsActive()) {
-        odometry.update();
+        this->drivetrain.drive(complete ? 0.0 : 1.0, 0.0);
+
+        double elapsed = duration<double>(high_resolution_clock::now() - start).count();
+        complete |= elapsed > 2.0;
+
+        double velocity = std::hypot(
+            odometry.pos.x,
+            odometry.pos.y
+        ) / (ODOMETRY_TICKS_PER_CM * 100.0);
+
+        if (!complete && velocity > max_velocity) {
+            max_velocity = velocity;
+            time_to_max_velocity = elapsed;
+        }
 
         this->telemetry->addLine(utils::sprintf(
-            "(velocity) x = %.2f; y = %.2f",
-            math::ticksToDistance(odometry.velocity.x, 0.03, 8192), // ms-1
-            math::ticksToDistance(odometry.velocity.y, 0.03, 8192)
+            "(benchmark) max velocity = %.2f; time taken = %.2f",
+            max_velocity,
+            time_to_max_velocity
         ));
 
-        this->telemetry->addLine(utils::sprintf(
-            "(position) x = %.2f; y = %.2f; θ = %.2f",
-            math::ticksToDistance(odometry.pos.x, 3.0, 8192),
-            math::ticksToDistance(odometry.pos.y, 3.0, 8192),
-            odometry.theta / M_PI * 180.0
-        ));
-
-        this->telemetry->update();
+        this->odometry.update();
+        this->printDebugInfo();
     }
 }

@@ -1,5 +1,4 @@
 #include "servo_tuner.h"
-#include "chrono"
 
 extern "C"
 JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_ServoTuner_runOpMode(JNIEnv *p_jni, jobject self) {
@@ -28,13 +27,8 @@ void ServoTuner::runOpMode() {
 
         servo->setPosition(position);
 
-        char name_telem[100];
-        sprintf(name_telem, "servo name = %s", servo_name.c_str());
-        this->telemetry->addLine(name_telem);
-
-        char position_telem[100];
-        sprintf(position_telem, "servo position = %.2f", position);
-        this->telemetry->addLine(position_telem);
+        this->telemetry->addLine(utils::sprintf("servo name = %s", servo_name.c_str()));
+        this->telemetry->addLine(utils::sprintf("servo position = %.2f", position));
 
         this->telemetry->update();
     }
