@@ -1,5 +1,4 @@
 #include "auton.h"
-#include "../utils/profiles/profiles.h"
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -49,34 +48,18 @@ void Auton::runOpMode() {
     this->waitForStart();
     this->odometry.init();
 
-    auto start = high_resolution_clock::now();
-
-    double max_velocity = 0.0;
-    double time_to_max_velocity = 0.0;
-
-    bool complete = false;
+    double targetY = 120.0 * ODOMETRY_TICKS_PER_CM;
 
     while (this->opModeIsActive()) {
-        this->drivetrain.drive(complete ? 0.0 : 1.0, 0.0);
+        double progress = odometry.pos.y / targetY;
+        auto feed_forward = profiles::paranoia(progress);
 
-        double elapsed = duration<double>(high_resolution_clock::now() - start).count();
-        complete |= elapsed > 2.0;
+        this->forward_power = progress < 0.0 || progress > 1.0 ? 0.0 : std::max(STALL_POWER, feed_forward.power);
 
-        double velocity = std::hypot(
-            odometry.pos.x,
-            odometry.pos.y
-        ) / (ODOMETRY_TICKS_PER_CM * 100.0);
-
-        if (!complete && velocity > max_velocity) {
-            max_velocity = velocity;
-            time_to_max_velocity = elapsed;
-        }
-
-        this->telemetry->addLine(utils::sprintf(
-            "(benchmark) max velocity = %.2f; time taken = %.2f",
-            max_velocity,
-            time_to_max_velocity
-        ));
+        this->drivetrain.drive(
+            this->forward_power,
+            0.0
+        );
 
         this->odometry.update();
         this->printDebugInfo();

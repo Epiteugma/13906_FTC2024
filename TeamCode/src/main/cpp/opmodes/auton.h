@@ -4,6 +4,7 @@
 #include "../utils/odometry/odometry.h"
 #include "../utils/utils.h"
 #include "../utils/constants.h"
+#include "../profiles/profiles.h"
 
 class Auton : C_OpMode {
     using C_OpMode::C_OpMode;
