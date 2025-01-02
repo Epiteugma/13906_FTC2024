@@ -26,90 +26,124 @@ void Drive::runOpMode() {
     this->extend_motor = this->hardwareMap->getDcMotor("extend");
     this->extend_motor->setDirection(C_DcMotor::C_Direction::REVERSE);
 
+    this->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
+    this->extend_motor->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
+    this->extend_motor->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+
     this->rotate_servo = this->hardwareMap->getServo("rotate");
     this->pickup_servo = this->hardwareMap->getServo("pickup");
     this->basket_servo = this->hardwareMap->getServo("basket");
 
     this->waitForStart();
 
-    this->rotate_servo->setPosition(ROTATE_SERVO_UP);
-    this->pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
-    this->basket_servo->setPosition(BASKET_SERVO_COLLECT);
+    this->rotate_position = ROTATE_SERVO_UP;
+    this->pickup_position = PICKUP_SERVO_CLOSED;
+    this->basket_position = BASKET_SERVO_COLLECT;
+    this->extend_power = EXTEND_BACK_POWER;
 
     while (this->opModeIsActive()) {
-        this->drivetrain.drive(
-            -this->gamepad1->left_stick_y(),
-            this->gamepad1->left_stick_x() ,
-            this->gamepad1->right_stick_x()
-        );
+        this->moveBase();
 
-        if (this->gamepad1->left_bumper()) {
-            this->drivetrain.multiplier = 0.25;
-        } else if (this->gamepad1->right_bumper()) {
-            this->drivetrain.multiplier = 1.0;
+        // anything not set in a loop dies
+        // when the battery level is too low
+        // hence, we store state manually
+
+        this->rotate_servo->setPosition(this->rotate_position);
+        this->pickup_servo->setPosition(this->pickup_position);
+        this->basket_servo->setPosition(this->basket_position);
+        this->extend_motor->setPower(this->extend_power);
+
+        this->collection();
+        this->placement();
+    }
+}
+
+void Drive::moveBase() {
+    this->drivetrain.drive(
+        -this->gamepad1->left_stick_y(),
+        this->gamepad1->left_stick_x(),
+        this->gamepad1->right_stick_x()
+    );
+
+    if (this->gamepad1->left_bumper()) {
+        this->drivetrain.multiplier = 0.25;
+    } else if (this->gamepad1->right_bumper()) {
+        this->drivetrain.multiplier = 1.0;
+    }
+}
+
+void Drive::extendExtension() {
+    this->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / 360.0 * EXTEND_TICKS_PER_REV);
+    this->extend_power = EXTEND_FORW_POWER;
+}
+
+void Drive::retractExtension() {
+    this->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
+    this->extend_power = EXTEND_BACK_POWER;
+}
+
+// collection is driver 1's responsibility...
+void Drive::collection() {
+    // extend rides until stall (may drain power)
+    // bad? yes. reliable? very
+
+    // i prefer devving with xbox gamepad buttons
+    // A = down, B = right, Y = up, X = left
+    if (this->gamepad1->y()) { // far away pickup
+        this->extendExtension();
+
+        this->rotate_position = ROTATE_SERVO_DOWN;
+    } else if (this->gamepad1->a()) { // retract + deposit into basket
+        this->retractExtension();
+
+        this->rotate_position = ROTATE_SERVO_UP;
+        this->pickup_position = PICKUP_SERVO_CLOSED; // safety, prevents potential damage to basket
+    } else if (this->gamepad1->x() || this->gamepad2->x()) { // middle position, any gamepad to allow fast lifting
+        this->rotate_position = ROTATE_SERVO_MID;
+    } else if (this->gamepad1->b()) { // close-up pickup
+        this->retractExtension();
+
+        this->rotate_position = ROTATE_SERVO_DOWN;
+    }
+
+    if (this->gamepad1->dpad_up()) {
+        this->pickup_position = PICKUP_SERVO_OPEN;
+    } else if (this->gamepad1->dpad_down()) {
+        this->pickup_position = PICKUP_SERVO_CLOSED;
+    }
+}
+
+// ...while placement is driver 2's responsibility
+void Drive::placement() {
+    float lift_power = -this->gamepad2->left_stick_y();
+
+    if (lift_power == 0.0) {
+        if (this->lift_1->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
+            this->lift_1->setTargetPosition(this->lift_1->getCurrentPosition());
         }
 
-        if (this->gamepad2->dpad_up()) {
-            this->rotate_servo->setPosition(ROTATE_SERVO_DOWN);
-        } else if (this->gamepad2->dpad_down()) {
-            this->rotate_servo->setPosition(ROTATE_SERVO_UP);
-            this->basket_servo->setPosition(BASKET_SERVO_COLLECT);
+        if (this->lift_2->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
+            this->lift_2->setTargetPosition(this->lift_2->getCurrentPosition());
         }
 
-        if (this->gamepad2->dpad_left()) {
-            this->rotate_servo->setPosition(ROTATE_SERVO_MID);
-        }
+        this->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+        this->lift_1->setPower(LIFT_HOLD_POWER);
 
-        if (this->gamepad2->a()) {
-            this->pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
-        } else if (this->gamepad2->y()) {
-            this->pickup_servo->setPosition(PICKUP_SERVO_OPEN);
-        }
+        this->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+        this->lift_2->setPower(LIFT_HOLD_POWER);
+    } else {
+        this->lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+        this->lift_1->setPower(lift_power);
 
-        if (this->gamepad2->right_bumper()) {
-            this->basket_servo->setPosition(BASKET_SERVO_COLLECT);
-        } else if (this->gamepad2->left_bumper()) {
-            this->basket_servo->setPosition(BASKET_SERVO_SCORE);
-        } else if (this->gamepad2->dpad_right()) {
-            this->basket_servo->setPosition(BASKET_SERVO_BALANCE);
-        }
+        this->lift_2->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+        this->lift_2->setPower(lift_power);
+    }
 
-        float lift_power = -this->gamepad2->left_stick_y();
-
-        if (lift_power == 0.0) {
-            if (this->lift_1->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
-                this->lift_1->setTargetPosition(this->lift_1->getCurrentPosition());
-            }
-
-            if (this->lift_2->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
-                this->lift_2->setTargetPosition(this->lift_2->getCurrentPosition());
-            }
-
-            this->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-            this->lift_1->setPower(LIFT_HOLD_POWER);
-
-            this->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-            this->lift_2->setPower(LIFT_HOLD_POWER);
-        } else {
-            this->lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-            this->lift_1->setPower(lift_power);
-
-            this->lift_2->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-            this->lift_2->setPower(lift_power);
-        }
-
-        float extend_power = (this->gamepad2->right_trigger() - this->gamepad2->left_trigger()) * 0.75f;
-
-        if (extend_power == 0.0) {
-            if (this->extend_motor->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
-                this->extend_motor->setTargetPosition(this->extend_motor->getCurrentPosition());
-            }
-
-            this->extend_motor->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-            this->extend_motor->setPower(EXTEND_HOLD_POWER);
-        } else {
-            this->extend_motor->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-            this->extend_motor->setPower(extend_power);
-        }
+    if (this->gamepad2->y()) {
+        this->basket_position = BASKET_SERVO_SCORE;
+    } else if (this->gamepad2->b()) {
+        this->basket_position = BASKET_SERVO_BALANCE;
+    } else if (this->gamepad2->a()) {
+        this->basket_position = BASKET_SERVO_COLLECT;
     }
 }
