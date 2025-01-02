@@ -1,6 +1,7 @@
 #pragma once
 #include "../lib/c_op_mode.h"
 #include "../utils/kinematics/drivetrain.h"
+#include "../utils/control/pid.h"
 #include "../utils/odometry/odometry.h"
 #include "../utils/utils.h"
 #include "../utils/constants.h"
@@ -11,7 +12,9 @@ class Auton : C_OpMode {
 
     Odometry odometry{};
     Drivetrain drivetrain{};
-    double forward_power = 0;
+
+    double forward_power;
+    double strafe_power;
 
     void printDebugInfo();
 public:

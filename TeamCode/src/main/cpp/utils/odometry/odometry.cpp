@@ -31,8 +31,16 @@ void Odometry::update() {
 }
 
 void Odometry::init() {
-    this->last_left = this->left->getCurrentPosition();
-    this->last_right = this->right->getCurrentPosition();
-    this->last_perp = this->perp == nullptr ? 0 : this->perp->getCurrentPosition();
+    this->left->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
+    this->left->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+
+    this->right->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
+    this->right->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+
+    if (this->perp != nullptr) {
+        this->perp->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
+        this->perp->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+    }
+
     this->last_update = high_resolution_clock::now();
 }
