@@ -62,13 +62,13 @@ void Drive::moveBase() {
     this->drivetrain.drive(
         -this->gamepad1->left_stick_y(),
         this->gamepad1->left_stick_x(),
-        this->gamepad1->right_stick_x()
+        this->gamepad1->right_stick_x() * DRIVETRAIN_TURN_MLT
     );
 
     if (this->gamepad1->left_bumper()) {
-        this->drivetrain.multiplier = 0.25;
+        this->drivetrain.multiplier = DRIVETRAIN_SLOW_MLT;
     } else if (this->gamepad1->right_bumper()) {
-        this->drivetrain.multiplier = 1.0;
+        this->drivetrain.multiplier = DRIVETRAIN_FAST_MLT;
     }
 }
 
@@ -132,6 +132,9 @@ void Drive::placement() {
         this->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
         this->lift_2->setPower(LIFT_HOLD_POWER);
     } else {
+        if (lift_power > 0.0) lift_power *= LIFT_UP_MLT;
+        else lift_power *= LIFT_DOWN_MLT;
+
         this->lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
         this->lift_1->setPower(lift_power);
 

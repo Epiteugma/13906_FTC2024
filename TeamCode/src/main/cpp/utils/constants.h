@@ -1,7 +1,11 @@
 #pragma once
 
+#define DRIVETRAIN_FAST_MLT 1.0
+#define DRIVETRAIN_SLOW_MLT 0.25
+#define DRIVETRAIN_TURN_MLT 0.75
+
 #define ROTATE_SERVO_UP   0.85
-#define ROTATE_SERVO_MID 0.5
+#define ROTATE_SERVO_MID  0.5
 #define ROTATE_SERVO_DOWN 0.12
 
 #define PICKUP_SERVO_CLOSED 0.0
@@ -17,6 +21,8 @@
 #define EXTEND_BACK_POWER    0.3
 
 #define LIFT_HOLD_POWER 0.2
+#define LIFT_UP_MLT     1.0
+#define LIFT_DOWN_MLT   0.75
 
 #define ODOMETRY_TICKS_PER_REV 8192.0
 #define ODOMETRY_WHEEL_RADIUS  3.0

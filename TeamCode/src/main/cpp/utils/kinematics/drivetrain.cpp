@@ -1,6 +1,14 @@
 #include "drivetrain.h"
 
 void Drivetrain::drive(double forward_power, double turn_power) const {
+    if (turn_power > 1.0) turn_power = 1.0;
+    else if (turn_power < -1.0) turn_power = -1.0;
+
+    if (forward_power > 1.0) forward_power = 1.0;
+    else if (forward_power < -1.0) forward_power = -1.0;
+
+    forward_power *= 1 - std::abs(turn_power);
+
     if (front_left != nullptr) front_left->setPower((forward_power + turn_power) * this->multiplier);
     if (front_right != nullptr) front_right->setPower((forward_power - turn_power) * this->multiplier);
     if (back_left != nullptr) back_left->setPower((forward_power + turn_power) * this->multiplier);
@@ -11,8 +19,15 @@ void Drivetrain::drive(double forward_power, double strafe_power, double turn_po
     double magnitude = std::hypot(forward_power, strafe_power);
     double direction = std::atan2(forward_power, strafe_power);
 
+    if (magnitude > 1.0) magnitude = 1.0;
+
+    if (turn_power > 1.0) turn_power = 1.0;
+    else if (turn_power < -1.0) turn_power = -1.0;
+
+    magnitude *= 1 - std::abs(turn_power);
+
     math::vec2 v{
-        magnitude > 1.0 ? 1.0 : magnitude,
+        magnitude,
         0.0
     };
 
