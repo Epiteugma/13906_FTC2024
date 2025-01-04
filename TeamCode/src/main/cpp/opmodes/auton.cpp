@@ -22,6 +22,7 @@ void Auton::printDebugInfo() {
 
     this->telemetry->addLine(utils::sprintf("forward power = %.2f", this->forward_power));
     this->telemetry->addLine(utils::sprintf("strafe power = %.2f", this->strafe_power));
+    this->telemetry->addLine(utils::sprintf("turn power = %.2f", this->turn_power));
 
     this->telemetry->update();
 }
@@ -46,6 +47,8 @@ void Auton::runOpMode() {
         12.5 * ODOMETRY_TICKS_PER_CM
     };
 
+    this->odometry.right->setDirection(C_DcMotor::C_Direction::REVERSE);
+
     this->waitForStart();
     this->odometry.init();
 
@@ -54,27 +57,32 @@ void Auton::runOpMode() {
         120.0 * ODOMETRY_TICKS_PER_CM
     };
 
+    double target_heading = 0.0;
+
     // 1 meter error = power 1
+    // 90 deg error = power 1
     PID pid[] = {
         {1 / (ODOMETRY_TICKS_PER_CM * 100)},
-        {1 / (ODOMETRY_TICKS_PER_CM * 100)}
+        {1 / (ODOMETRY_TICKS_PER_CM * 100)},
+        {1.0 / (90 / 180.0 * M_PI)}
     };
 
     while (this->opModeIsActive()) {
         math::vec2 pid_values = {
             pid[0].update(target.x, odometry.pos.x),
-            pid[1].update(target.y, odometry.pos.y)
+            pid[1].update(target.y, odometry.pos.y),
         };
 
         pid_values.rotate(-odometry.theta);
 
         this->strafe_power = pid_values.x;
         this->forward_power = pid_values.y;
+        this->turn_power = pid[2].update(target_heading, -odometry.theta);
 
         this->drivetrain.drive(
             this->forward_power,
             this->strafe_power,
-            0.0
+            this->turn_power
         );
 
         this->odometry.update();

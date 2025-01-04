@@ -15,6 +15,7 @@ class Auton : C_OpMode {
 
     double forward_power;
     double strafe_power;
+    double turn_power;
 
     void printDebugInfo();
 public:
