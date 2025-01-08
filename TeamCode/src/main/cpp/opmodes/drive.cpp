@@ -65,9 +65,9 @@ void Drive::moveBase() {
         this->gamepad1->right_stick_x() * DRIVETRAIN_TURN_MLT
     );
 
-    if (this->gamepad1->x()) {
+    if (this->gamepad1->left_bumper()) {
         this->drivetrain.multiplier = DRIVETRAIN_SLOW_MLT;
-    } else if (this->gamepad1->b()) {
+    } else if (this->gamepad1->right_bumper()) {
         this->drivetrain.multiplier = DRIVETRAIN_FAST_MLT;
     }
 }
@@ -89,26 +89,26 @@ void Drive::collection() {
 
     // i prefer devving with xbox gamepad buttons
     // A = down, B = right, Y = up, X = left
-    if (this->gamepad1->dpad_up() || this->gamepad1->right_bumper()) { // far away pickup
+    if (this->gamepad2->dpad_up()) { // far away pickup
         this->extendExtension();
 
         this->rotate_position = ROTATE_SERVO_DOWN;
-    } else if (this->gamepad1->dpad_down() || this->gamepad1->left_bumper()) { // retract + deposit into basket
+    } else if (this->gamepad2->dpad_down()) { // retract + deposit into basket
         this->retractExtension();
 
         this->rotate_position = ROTATE_SERVO_UP;
         this->pickup_position = PICKUP_SERVO_CLOSED; // safety, prevents potential damage to basket
-    } else if (this->gamepad1->dpad_left() || this->gamepad2->x()) { // middle position, any gamepad to allow fast lifting
+    } else if (this->gamepad2->dpad_left()) { // middle position, any gamepad to allow fast lifting
         this->rotate_position = ROTATE_SERVO_MID;
-    } else if (this->gamepad1->dpad_right()) { // close-up pickup
+    } else if (this->gamepad2->dpad_right()) { // close-up pickup
         this->retractExtension();
 
         this->rotate_position = ROTATE_SERVO_DOWN;
     }
 
-    if (this->gamepad1->y()) {
+    if (this->gamepad2->y()) {
         this->pickup_position = PICKUP_SERVO_OPEN;
-    } else if (this->gamepad1->a()) {
+    } else if (this->gamepad2->a()) {
         this->pickup_position = PICKUP_SERVO_CLOSED;
     }
 }
@@ -142,11 +142,11 @@ void Drive::placement() {
         this->lift_2->setPower(lift_power);
     }
 
-    if (this->gamepad2->y() || this->gamepad2->right_bumper()) {
+    if (this->gamepad2->right_bumper()) {
         this->basket_position = BASKET_SERVO_SCORE;
-    } else if (this->gamepad2->b() || this->gamepad2->dpad_right()) {
+    } else if (this->gamepad2->square()) {
         this->basket_position = BASKET_SERVO_BALANCE;
-    } else if (this->gamepad2->a() || this->gamepad2->left_bumper()) {
+    } else if (this->gamepad2->left_bumper()) {
         this->basket_position = BASKET_SERVO_COLLECT;
     }
 }
