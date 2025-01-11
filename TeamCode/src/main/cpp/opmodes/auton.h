@@ -13,6 +13,9 @@ class Auton : C_OpMode {
     Odometry odometry{};
     Drivetrain drivetrain{};
 
+    C_DcMotor *lift_1;
+    C_DcMotor *lift_2;
+
     double forward_power;
     double strafe_power;
     double turn_power;

@@ -92,7 +92,7 @@ void Drive::collection() {
     if (this->gamepad2->dpad_up()) { // far away pickup
         this->extendExtension();
 
-        this->rotate_position = ROTATE_SERVO_DOWN;
+
     } else if (this->gamepad2->dpad_down()) { // retract + deposit into basket
         this->retractExtension();
 
@@ -101,7 +101,7 @@ void Drive::collection() {
     } else if (this->gamepad2->dpad_left()) { // middle position, any gamepad to allow fast lifting
         this->rotate_position = ROTATE_SERVO_MID;
     } else if (this->gamepad2->dpad_right()) { // close-up pickup
-        this->retractExtension();
+
 
         this->rotate_position = ROTATE_SERVO_DOWN;
     }

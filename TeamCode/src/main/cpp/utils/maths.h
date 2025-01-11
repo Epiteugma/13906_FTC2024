@@ -13,5 +13,7 @@ namespace math {
         double x;
         double y;
         double z;
+
+        vec2 xy();
     };
 }

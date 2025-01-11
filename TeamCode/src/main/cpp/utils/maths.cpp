@@ -7,3 +7,7 @@ void math::vec2::rotate(double theta) {
     this->x = std::cos(theta) * old_x - std::sin(theta) * old_y;
     this->y = std::sin(theta) * old_x + std::cos(theta) * old_y;
 }
+
+math::vec2 math::vec3::xy() {
+    return {this->x, this->y};
+}
