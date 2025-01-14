@@ -21,6 +21,9 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         p_auton->lift_1->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
         p_auton->lift_2->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
 
+        p_auton->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+        p_auton->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+
         p_auton->lift_1->setPower(LIFT_UP_MLT);
         p_auton->lift_2->setPower(LIFT_UP_MLT);
 
@@ -42,8 +45,11 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         p_auton->lift_1->setTargetPosition(0);
         p_auton->lift_2->setTargetPosition(0);
 
-        p_auton->lift_1->setPower(0.0);
-        p_auton->lift_2->setPower(0.0);
+        p_auton->lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+        p_auton->lift_2->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+
+        p_auton->lift_1->setPower(-0.5);
+        p_auton->lift_2->setPower(-0.5);
 
         double lift_1_err = std::abs(p_auton->lift_1->getCurrentPosition() / LIFT_TICKS_PER_CM);
         double lift_2_err = std::abs(p_auton->lift_2->getCurrentPosition() / LIFT_TICKS_PER_CM);
