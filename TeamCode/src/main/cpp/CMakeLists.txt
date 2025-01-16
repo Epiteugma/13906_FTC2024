@@ -23,6 +23,7 @@ add_library(teamcode SHARED
         opmodes/servo_tuner.cpp
         opmodes/auton.cpp
         opmodes/auton_place.cpp
+        opmodes/auton_park.cpp
 )
 
 target_link_libraries(teamcode

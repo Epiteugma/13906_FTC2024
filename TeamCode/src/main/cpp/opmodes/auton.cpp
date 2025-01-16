@@ -43,7 +43,7 @@ void Auton::init() {
         this->drivetrain.back_left,
         this->hardwareMap->getDcMotor("right_encoder"),
         drivetrain.front_left,
-        15.0 * ODOMETRY_TICKS_PER_CM,
+        17.0 * ODOMETRY_TICKS_PER_CM,
         12.5 * ODOMETRY_TICKS_PER_CM
     };
 
