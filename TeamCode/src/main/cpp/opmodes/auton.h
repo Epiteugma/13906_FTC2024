@@ -12,10 +12,6 @@
 struct AutonAction;
 
 class Auton : public C_OpMode {
-    int node_index;
-    int action_index;
-    math::vec3 target;
-
     PID pid_x;
     PID pid_y;
     PID pid_z;
@@ -33,6 +29,10 @@ public:
         std::vector<math::vec3> path,
         std::vector<AutonAction> actions
     );
+
+    int node_index;
+    int action_index;
+    math::vec3 target;
 
     Odometry odometry{};
     Drivetrain drivetrain{};

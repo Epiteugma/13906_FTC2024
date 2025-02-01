@@ -7,16 +7,16 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
     std::vector<math::vec3> path = {
         {-30.0, -60.0, 0.0},
         {-30.0, -60.0, -45.0},
-        {-15.0, -75.0, -45.0},
+        {-10.0, -70.0, -45.0},
+        {-20.0, -50.0, -45.0},
+        {-20.0, -50.0, -180.0},
+        {-30.0, -5.0, -180.0},
+        {-85.0, -5.0, -180.0},
+        {-85.0, -20.0, -180.0},
+        {-85.0, -20.0, -45.0},
         {-30.0, -60.0, -45.0},
-        {-30.0, -45.0, -180.0},
-        {-30.0, 0.0, -180.0},
-        {-85.0, 0.0, -180.0},
-        {-85.0, -17.0, -180.0},
-        {-85.0, -17.0, -45.0},
-        {-30.0, -60.0, -45.0},
-        {0.0, -60.0, -45.0},
-        {0.0, -50.0, -45.0},
+        {-5.0, -60.0, -45.0},
+        {-5.0, -40.0, -45.0},
 
     };
 
@@ -134,18 +134,9 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
     };
 
     auto release_block = [&](AutonAction &action, Auton *p_auton){
-        if (block_timer == time_point<high_resolution_clock>())  {
-            block_timer = high_resolution_clock::now();
-        }
-
         p_auton->pickup_servo->setPosition(PICKUP_SERVO_OPEN);
         p_auton->rotate_servo->setPosition(ROTATE_SERVO_MID);
-        duration<double> delta = high_resolution_clock::now() - block_timer;
-
-        if (delta.count() > 1.0) {
-            action.done = true;
-            block_timer = high_resolution_clock::time_point();
-        }
+        action.done = true;
     };
 
     std::vector<AutonAction> actions = {
@@ -174,11 +165,11 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         {7, release_block, "rb"},
         {9, extend_lift, "extend"},
         {10, place_block, "place"},
-        {11, retract_lift, "place"},
+        {11, retract_lift, "rb"},
     };
 
-    PID pid_x = {1.0 / 35.0};
-    PID pid_y = {1.0 / 35.0};
+    PID pid_x = {1.0 / 25.0};
+    PID pid_y = {1.0 / 25.0};
     PID pid_z = {1.0 / 20.0};
 
     (new Auton(p_jni, self, pid_x, pid_y, pid_z, path, actions))->runOpMode();
