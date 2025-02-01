@@ -4,6 +4,7 @@
 
 #include "c_dc_motor.h"
 #include "c_servo.h"
+#include "c_touchsensor.h"
 
 class C_HardwareMap {
     JNIEnv *p_jni;
@@ -16,4 +17,5 @@ public:
 
     C_DcMotor *getDcMotor(const std::string& name);
     C_Servo *getServo(const std::string& name);
+    C_TouchSensor *getTouchSensor(const std::string& name);
 };

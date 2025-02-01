@@ -30,3 +30,12 @@ C_Servo *C_HardwareMap::getServo(const std::string& name) {
 
     return servo;
 }
+
+C_TouchSensor *C_HardwareMap::getTouchSensor(const std::string& name) {
+    jstring j_name = this->p_jni->NewStringUTF(name.c_str());
+
+    auto* touch_sensor = new C_TouchSensor(this->p_jni, this->p_jni->CallObjectMethod(this->self, this->m_get, this->p_jni->FindClass("com/qualcomm/robotcore/hardware/TouchSensor"), j_name));
+    this->p_jni->DeleteLocalRef(j_name);
+
+    return touch_sensor;
+}

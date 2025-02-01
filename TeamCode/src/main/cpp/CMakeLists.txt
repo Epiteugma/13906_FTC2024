@@ -10,6 +10,7 @@ add_library(teamcode SHARED
         lib/hardware/c_hardware_map.cpp
         lib/hardware/c_dc_motor.cpp
         lib/hardware/c_servo.cpp
+        lib/hardware/c_touchsensor.cpp
 
         utils/kinematics/drivetrain.cpp
         utils/maths.cpp
