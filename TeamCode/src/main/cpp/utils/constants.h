@@ -17,6 +17,7 @@
 
 #define EXTEND_TICKS_PER_REV (28.0 * 25.0)
 #define EXTEND_MAX_DEGREES   70.0
+#define EXTEND2_MAX_DEGREES   720.0
 #define EXTEND_FORW_POWER    1.0
 #define EXTEND_BACK_POWER    0.3
 

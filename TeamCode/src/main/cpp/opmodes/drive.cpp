@@ -26,13 +26,14 @@ void Drive::runOpMode() {
     this->extend_motor = this->hardwareMap->getDcMotor("extend");
     this->extend_motor->setDirection(C_DcMotor::C_Direction::REVERSE);
 
-    this->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
+    this->extend_motor->setTargetPosition(EXTEND2_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
     this->extend_motor->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
     this->extend_motor->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
 
     this->rotate_servo = this->hardwareMap->getServo("rotate");
     this->pickup_servo = this->hardwareMap->getServo("pickup");
     this->basket_servo = this->hardwareMap->getServo("basket");
+
 
     this->waitForStart();
 

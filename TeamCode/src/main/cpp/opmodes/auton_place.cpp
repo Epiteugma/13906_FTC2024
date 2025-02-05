@@ -11,12 +11,12 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         {-20.0, -50.0, -45.0},
         {-20.0, -50.0, -180.0},
         {-30.0, -5.0, -180.0},
-        {-85.0, -5.0, -180.0},
-        {-85.0, -20.0, -180.0},
-        {-85.0, -20.0, -45.0},
-        {-30.0, -60.0, -45.0},
-        {-5.0, -60.0, -45.0},
-        {-5.0, -40.0, -45.0},
+        {-83.0, -5.0, -180.0},
+        {-83.0, -18.0, -180.0},
+        {-83.0, -18.0, -45.0},
+        {-30.0, -65.0, -45.0},
+        {-0.0, -65.0, -45.0},
+        {-0.0, -40.0, -45.0},
 
     };
 
@@ -51,8 +51,8 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         p_auton->lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
         p_auton->lift_2->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
 
-        p_auton->lift_1->setPower(-0.2);
-        p_auton->lift_2->setPower(-0.2);
+        p_auton->lift_1->setPower(-1.0);
+        p_auton->lift_2->setPower(-1.0);
 
         double lift_1_err = std::abs(p_auton->lift_1->getCurrentPosition() / LIFT_TICKS_PER_CM);
         double lift_2_err = std::abs(p_auton->lift_2->getCurrentPosition() / LIFT_TICKS_PER_CM);
