@@ -28,7 +28,7 @@ void RegressorTest::runOpMode() {
         this->hardwareMap->getDcMotor("left_encoder"),
         this->hardwareMap->getDcMotor("right_encoder"),
         this->hardwareMap->getDcMotor("perp_encoder"),
-        45.72 * o_ticks_per_cm,
+        45.0 * o_ticks_per_cm,
         -o.track_width / 2.0,
     };
 

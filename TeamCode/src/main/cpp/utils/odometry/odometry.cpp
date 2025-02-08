@@ -15,18 +15,40 @@ void Odometry::update() {
 
     double phi = (delta_right - delta_left) / this->track_width;
 
-    math::vec2 vec{
+    //math::vec2 robot_relative = {
+    //    std::sin(this->theta + delta_time.count() * phi) - std::sin(this->theta),
+    //    -std::cos(this->theta + delta_time.count() * phi) + std::cos(this->theta)
+    //};
+
+    math::vec2 robot_relative{
         delta_perp + (phi * this->perp_offset),
         (delta_right + delta_left) / 2.0,
     };
 
-    vec.rotate(this->theta);
+    double phi_integrator[] = {
+        std::sin(phi) / phi, (std::cos(phi) - 1) / phi,
+        (-std::cos(phi) + 1) / phi, std::sin(phi) / phi
+    };
 
-    this->velocity.x = vec.x / delta_time.count();
-    this->velocity.y = vec.y / delta_time.count();
+    if (phi == 0.0) {
+        phi_integrator[0] = 1.0;
+        phi_integrator[1] = 0.0;
+        phi_integrator[2] = 0.0;
+        phi_integrator[3] = 1.0;
+    }
 
-    this->pos.x += vec.x;
-    this->pos.y += vec.y;
+    math::vec2 field_relative{
+        phi_integrator[0] * robot_relative.x + phi_integrator[1] * robot_relative.y,
+        phi_integrator[2] * robot_relative.x + phi_integrator[3] * robot_relative.y,
+    };
+
+    field_relative.rotate(this->theta);
+
+    this->velocity.x = field_relative.x / delta_time.count();
+    this->velocity.y = field_relative.y / delta_time.count();
+
+    this->pos.x += field_relative.x;
+    this->pos.y += field_relative.y;
     this->theta += phi;
 }
 
