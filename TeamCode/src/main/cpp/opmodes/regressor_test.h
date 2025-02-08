@@ -5,6 +5,8 @@
 #include "../utils/utils.h"
 #include <chrono>
 #include <cmath>
+#include <map>
+#include <vector>
 
 class RegressorTest : C_OpMode {
 public:

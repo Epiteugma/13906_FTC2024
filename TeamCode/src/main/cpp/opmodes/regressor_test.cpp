@@ -38,18 +38,78 @@ void RegressorTest::runOpMode() {
     this->waitForStart();
     o.init();
 
+    std::map<double, std::vector<double>> mappuchino{};
+    auto start = std::chrono::system_clock::now();
+
     while (this->opModeIsActive()) {
-        std::chrono::duration<double> time_since_epoch = std::chrono::high_resolution_clock::now().time_since_epoch();
-        auto millis = (long long) (time_since_epoch.count() * 1000);
+        std::chrono::duration<double> time_since_start = (std::chrono::system_clock::now() - start);
+        auto millis = (long long) (time_since_start.count() * 1000);
 
-        double out = std::sin((int) (millis % 5000) / 5000.0 * 2 * M_PI);
+        if (time_since_start.count() > 30.0) break;
 
-        d.drive(out * 0.2, 0.0);
+        double out = std::sin((int) (millis % 5000) / 5000.0 * 2 * M_PI) * 0.3;
+
+        d.drive(out, 0.0);
         o.update();
+
+        this->telemetry->addLine(utils::sprintf("== BENCHMARKING... %.2fs ==", 30.0 - time_since_start.count()));
+
+        if (mappuchino.find(out) == mappuchino.end()) {
+            mappuchino[out] = {};
+        }
+
+        mappuchino[out].push_back(std::hypot(o.velocity.x / o_ticks_per_cm, o.velocity.y / o_ticks_per_cm));
 
         this->telemetry->addLine(utils::sprintf("x = %.2f", o.pos.x / o_ticks_per_cm));
         this->telemetry->addLine(utils::sprintf("y = %.2f", o.pos.y / o_ticks_per_cm));
         this->telemetry->addLine(utils::sprintf("theta = %.2f", o.theta / M_PI * 180.0));
+        this->telemetry->update();
+    }
+
+    d.drive(0.0, 0.0);
+
+    double v_max = 0.0;
+    double p_at_v_max = -1.0;
+
+    double p_at_v0_sum = 0.0;
+    int p_at_v0_count = 0;
+
+    long p_count = 0;
+    long v_count = 0;
+
+    for (auto &pow : mappuchino) {
+        p_count++;
+
+        for (auto vel : pow.second) {
+            v_count++;
+
+            if (vel > v_max) {
+                v_max = vel;
+                p_at_v_max = std::abs(pow.first);
+            }
+
+            if (std::abs(vel) < 1.0) {
+                p_at_v0_sum += pow.first;
+                p_at_v0_count++;
+            }
+        }
+    }
+
+    double avg_p_at_v0 = p_at_v0_sum / (double) p_at_v0_count;
+
+    this->telemetry->speak("benchmark complete");
+
+    while (this->opModeIsActive()) {
+        this->telemetry->addLine(utils::sprintf("v_max = %.2f", v_max));
+        this->telemetry->addLine(utils::sprintf("p_at_v_max = %.2f", p_at_v_max));
+        this->telemetry->addLine(utils::sprintf("avg_p_at_v0 = %.2f", avg_p_at_v0));
+
+        this->telemetry->addLine();
+        this->telemetry->addLine(utils::sprintf("p_count = %ld", p_count));
+        this->telemetry->addLine(utils::sprintf("v_count = %ld", v_count));
+
+        this->telemetry->addLine();
+        this->telemetry->addLine("== BENCHMARK COMPLETE ==");
         this->telemetry->update();
     }
 }

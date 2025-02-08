@@ -8,6 +8,7 @@ class C_Telemetry {
 
     jmethodID m_addLine;
     jmethodID m_addLineEmpty;
+    jmethodID m_speak;
     jmethodID m_update;
 public:
     C_Telemetry(JNIEnv *p_jni, jobject self);
@@ -15,5 +16,6 @@ public:
 
     void addLine(const std::string& line);
     void addLine();
+    void speak(const std::string& text);
     bool update();
 };
