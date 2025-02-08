@@ -1,19 +1,22 @@
 #pragma once
-#include "cmath"
+#include <memory>
 
-namespace math {
-    struct vec2 {
-        double x;
-        double y;
+namespace maths {
+    using vec2 = double[2];
+    using vec3 = double[3];
 
-        void rotate(double theta);
-    };
+    class mat {
+        int rows;
+        int cols;
 
-    struct vec3 {
-        double x;
-        double y;
-        double z;
+        std::unique_ptr<double[]> data;
+    public:
+        mat(int rows, int cols);
 
-        vec2 xy();
+        [[nodiscard]] int get_rows() const;
+        [[nodiscard]] int get_cols() const;
+
+        double *operator[](int row);
+        const double *operator[](int row) const;
     };
 }

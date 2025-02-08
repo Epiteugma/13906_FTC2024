@@ -1,13 +1,28 @@
 #include "maths.h"
 
-void math::vec2::rotate(double theta) {
-    double old_x = this->x;
-    double old_y = this->y;
+maths::mat::mat(int rows, int cols) {
+    this->rows = rows;
+    this->cols = cols;
 
-    this->x = std::cos(theta) * old_x - std::sin(theta) * old_y;
-    this->y = std::sin(theta) * old_x + std::cos(theta) * old_y;
+    this->data = std::unique_ptr<double[]>(new double[rows * cols]);
+
+    for (int i = 0; i < rows * cols; i++) {
+        this->data[i] = 0;
+    }
 }
 
-math::vec2 math::vec3::xy() {
-    return {this->x, this->y};
+int maths::mat::get_rows() const {
+    return this->rows;
+}
+
+int maths::mat::get_cols() const {
+    return this->cols;
+}
+
+double *maths::mat::operator[](int row) {
+    return this->data.get() + row * this->cols;
+}
+
+const double *maths::mat::operator[](int row) const {
+    return this->data.get() + row * this->cols;
 }

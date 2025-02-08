@@ -1,22 +1,23 @@
 #include "pid.h"
 
-double PID::update(double target, double current) {
-    auto now = high_resolution_clock::now();
-    duration<double> delta_time = now - this->last_update;
-    this->last_update = now;
+PID::PID(double kP, double kI, double kD) {
+    this->coefficients[0] = kP;
+    this->coefficients[1] = kI;
+    this->coefficients[2] = kD;
+}
 
-    double error = target - current;
+double PID::update(double error, std::chrono::duration<double> delta_time) {
+    double p = this->coefficients[0] * error;
+    double i = this->coefficients[1] * error * delta_time.count();
+    double d = this->coefficients[2] * (error - this->p_error) / delta_time.count();
 
-    double p = this->kP * error;
-    double i = this->kI * error * delta_time.count();
-    double d = this->kD * (error - this->last_error) / delta_time.count();
+    this->p_error = error;
+    this->it += i;
 
-    this->It += i;
-    return p + this->It + d;
+    return p + this->it + d;
 }
 
 void PID::reset() {
-    this->last_update = high_resolution_clock::now();
-    this->It = 0.0;
-    this->last_error = 0.0;
+    this->it = 0.0;
+    this->p_error = 0.0;
 }

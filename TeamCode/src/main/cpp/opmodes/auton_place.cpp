@@ -1,37 +1,37 @@
 #include "auton.h"
 
-
-
 extern "C"
 JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_runOpMode(JNIEnv *p_jni, jobject self) {
-    std::vector<math::vec3> path = {
-        {-30.0, -60.0, 0.0},
-        {-30.0, -60.0, -45.0},
-        {-10.0, -70.0, -45.0},
-        {-20.0, -50.0, -45.0},
-        {-20.0, -50.0, -180.0},
-        {-30.0, -5.0, -180.0},
-        {-83.0, -5.0, -180.0},
-        {-83.0, -18.0, -180.0},
-        {-83.0, -18.0, -45.0},
-        {-30.0, -65.0, -45.0},
-        {-0.0, -65.0, -45.0},
-        {-0.0, -40.0, -45.0},
-
+    std::vector<double> path = {
+        -30.0, -60.0, 0.0,
+        -30.0, -60.0, -45.0,
+        -10.0, -70.0, -45.0,
+        -20.0, -50.0, -45.0,
+        -20.0, -50.0, -180.0,
+        -30.0, -5.0, -180.0,
+        -83.0, -5.0, -180.0,
+        -83.0, -18.0, -180.0,
+        -83.0, -18.0, -45.0,
+        -30.0, -65.0, -45.0,
+        -0.0, -65.0, -45.0,
+        -0.0, -40.0, -45.0,
     };
 
+#ifndef PRACTICE_BOT
+    std::chrono::time_point<std::chrono::high_resolution_clock> timer;
+
     auto extend_lift = [](AutonAction &action, Auton *p_auton){
-        p_auton->lift_1->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
-        p_auton->lift_2->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
+        p_auton->robot->lift_1->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
+        p_auton->robot->lift_2->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
 
-        p_auton->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-        p_auton->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+        p_auton->robot->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+        p_auton->robot->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
 
-        p_auton->lift_1->setPower(LIFT_UP_MLT);
-        p_auton->lift_2->setPower(LIFT_UP_MLT);
+        p_auton->robot->lift_1->setPower(LIFT_UP_MLT);
+        p_auton->robot->lift_2->setPower(LIFT_UP_MLT);
 
-        double lift_1_err = std::abs(LIFT_UP_POSITION - p_auton->lift_1->getCurrentPosition() / LIFT_TICKS_PER_CM);
-        double lift_2_err = std::abs(LIFT_UP_POSITION - p_auton->lift_2->getCurrentPosition() / LIFT_TICKS_PER_CM);
+        double lift_1_err = std::abs(LIFT_UP_POSITION - p_auton->robot->lift_1->getCurrentPosition() / LIFT_TICKS_PER_CM);
+        double lift_2_err = std::abs(LIFT_UP_POSITION - p_auton->robot->lift_2->getCurrentPosition() / LIFT_TICKS_PER_CM);
 
         double lift_err = (lift_1_err + lift_2_err) / 2.0;
 
@@ -43,19 +43,19 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
     };
 
     auto retract_lift = [](AutonAction &action, Auton *p_auton){
-        p_auton->basket_servo->setPosition(BASKET_SERVO_COLLECT);
+        p_auton->robot->basket_servo->setPosition(BASKET_SERVO_COLLECT);
 
-        p_auton->lift_1->setTargetPosition(0);
-        p_auton->lift_2->setTargetPosition(0);
+        p_auton->robot->lift_1->setTargetPosition(0);
+        p_auton->robot->lift_2->setTargetPosition(0);
 
-        p_auton->lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-        p_auton->lift_2->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+        p_auton->robot->lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+        p_auton->robot->lift_2->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
 
-        p_auton->lift_1->setPower(-1.0);
-        p_auton->lift_2->setPower(-1.0);
+        p_auton->robot->lift_1->setPower(-1.0);
+        p_auton->robot->lift_2->setPower(-1.0);
 
-        double lift_1_err = std::abs(p_auton->lift_1->getCurrentPosition() / LIFT_TICKS_PER_CM);
-        double lift_2_err = std::abs(p_auton->lift_2->getCurrentPosition() / LIFT_TICKS_PER_CM);
+        double lift_1_err = std::abs(p_auton->robot->lift_1->getCurrentPosition() / LIFT_TICKS_PER_CM);
+        double lift_2_err = std::abs(p_auton->robot->lift_2->getCurrentPosition() / LIFT_TICKS_PER_CM);
 
         double lift_err = (lift_1_err + lift_2_err) / 2.0;
 
@@ -66,94 +66,93 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         if (lift_err < 10.0) action.done = true;
     };
 
-    time_point<high_resolution_clock> basket_reached_at;
     auto place_block = [&](AutonAction &action, Auton *p_auton){
-        if (basket_reached_at == time_point<high_resolution_clock>())  {
-            basket_reached_at = high_resolution_clock::now();
+        if (timer == std::chrono::time_point<std::chrono::high_resolution_clock>())  {
+            timer = std::chrono::high_resolution_clock::now();
         }
 
-        p_auton->lift_1->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
-        p_auton->lift_2->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
+        p_auton->robot->lift_1->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
+        p_auton->robot->lift_2->setTargetPosition((int) (LIFT_UP_POSITION * LIFT_TICKS_PER_CM));
 
-        p_auton->lift_1->setPower(LIFT_HOLD_POWER);
-        p_auton->lift_2->setPower(LIFT_HOLD_POWER);
+        p_auton->robot->lift_1->setPower(LIFT_HOLD_POWER);
+        p_auton->robot->lift_2->setPower(LIFT_HOLD_POWER);
 
-        p_auton->basket_servo->setPosition(BASKET_SERVO_SCORE);
+        p_auton->robot->basket_servo->setPosition(BASKET_SERVO_SCORE);
 
-        duration<double> basket_delta = high_resolution_clock::now() - basket_reached_at;
+        std::chrono::duration<double> basket_delta = std::chrono::high_resolution_clock::now() - timer;
 
         if (basket_delta.count() > 1.0) {
             action.done = true;
-            basket_reached_at = high_resolution_clock::time_point();
+            timer = std::chrono::high_resolution_clock::time_point();
         }
     };
 
-    time_point<high_resolution_clock> block_timer;
-
     auto rotate_to_block = [&](AutonAction &action, Auton *p_auton){
-        if (block_timer == time_point<high_resolution_clock>())  {
-            block_timer = high_resolution_clock::now();
+        if (timer == std::chrono::time_point<std::chrono::high_resolution_clock>())  {
+            timer = std::chrono::high_resolution_clock::now();
         }
 
-        p_auton->rotate_servo->setPosition(ROTATE_SERVO_DOWN);
-        p_auton->pickup_servo->setPosition(PICKUP_SERVO_OPEN);
-        duration<double> delta = high_resolution_clock::now() - block_timer;
+        p_auton->robot->rotate_servo->setPosition(ROTATE_SERVO_DOWN);
+        p_auton->robot->pickup_servo->setPosition(PICKUP_SERVO_OPEN);
+        std::chrono::duration<double> delta = std::chrono::high_resolution_clock::now() - timer;
 
         if (delta.count() > 1.0) {
             action.done = true;
-            block_timer = high_resolution_clock::time_point();
+            timer = std::chrono::high_resolution_clock::time_point();
         }
     };
 
     auto pickup_block = [&](AutonAction &action, Auton *p_auton){
-        if (block_timer == time_point<high_resolution_clock>())  {
-            block_timer = high_resolution_clock::now();
+        if (timer == std::chrono::time_point<std::chrono::high_resolution_clock>())  {
+            timer = std::chrono::high_resolution_clock::now();
         }
 
-        p_auton->pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
-        duration<double> delta = high_resolution_clock::now() - block_timer;
+        p_auton->robot->pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
+        std::chrono::duration<double> delta = std::chrono::high_resolution_clock::now() - timer;
 
         if (delta.count() > 1.0) {
             action.done = true;
-            block_timer = high_resolution_clock::time_point();
+            timer = std::chrono::high_resolution_clock::time_point();
         }
     };
 
     auto rotate_to_basket = [&](AutonAction &action, Auton *p_auton){
-        if (block_timer == time_point<high_resolution_clock>())  {
-            block_timer = high_resolution_clock::now();
+        if (timer == std::chrono::time_point<std::chrono::high_resolution_clock>())  {
+            timer = std::chrono::high_resolution_clock::now();
         }
 
-        p_auton->rotate_servo->setPosition(ROTATE_SERVO_UP);
-        duration<double> delta = high_resolution_clock::now() - block_timer;
+        p_auton->robot->rotate_servo->setPosition(ROTATE_SERVO_UP);
+        std::chrono::duration<double> delta = std::chrono::high_resolution_clock::now() - timer;
 
         if (delta.count() > 1.0) {
             action.done = true;
-            block_timer = high_resolution_clock::time_point();
+            timer = std::chrono::high_resolution_clock::time_point();
         }
     };
 
     auto release_block = [&](AutonAction &action, Auton *p_auton){
-        p_auton->pickup_servo->setPosition(PICKUP_SERVO_OPEN);
-        p_auton->rotate_servo->setPosition(ROTATE_SERVO_MID);
+        p_auton->robot->pickup_servo->setPosition(PICKUP_SERVO_OPEN);
+        p_auton->robot->rotate_servo->setPosition(ROTATE_SERVO_MID);
         action.done = true;
     };
+#endif
 
     std::vector<AutonAction> actions = {
+#ifndef PRACTICE_BOT // ONLY RUNS ON REAL BOT
         {-1, [](AutonAction &action, Auton *p_auton){
-            p_auton->lift_1->setTargetPosition(0);
-            p_auton->lift_2->setTargetPosition(0);
+            p_auton->robot->lift_1->setTargetPosition(0);
+            p_auton->robot->lift_2->setTargetPosition(0);
 
-            p_auton->lift_1->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-            p_auton->lift_2->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
+            p_auton->robot->lift_1->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
+            p_auton->robot->lift_2->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
 
-            p_auton->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-            p_auton->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+            p_auton->robot->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+            p_auton->robot->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
 
-            p_auton->extend_motor->setPower(1.0);
+            p_auton->robot->extend_motor->setPower(1.0);
 
-            p_auton->rotate_servo->setPosition(ROTATE_SERVO_MID);
-            p_auton->basket_servo->setPosition(BASKET_SERVO_COLLECT);
+            p_auton->robot->rotate_servo->setPosition(ROTATE_SERVO_MID);
+            p_auton->robot->basket_servo->setPosition(BASKET_SERVO_COLLECT);
         }, "init"},
 
         {1, extend_lift, "extend lift"},
@@ -166,11 +165,12 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         {9, extend_lift, "extend"},
         {10, place_block, "place"},
         {11, retract_lift, "rb"},
+#endif
     };
 
-    PID pid_x = {1.0 / 25.0};
-    PID pid_y = {1.0 / 25.0};
-    PID pid_z = {1.0 / 20.0};
+    auto pid_x = new PID(1.0 / 20.0, 0.0, 0.0);
+    auto pid_y = new PID(1.0 / 20.0, 0.0, 0.0);
+    auto pid_z = new PID(1.0 / 20.0, 0.0, 0.0);
 
     (new Auton(p_jni, self, pid_x, pid_y, pid_z, path, actions))->runOpMode();
 }

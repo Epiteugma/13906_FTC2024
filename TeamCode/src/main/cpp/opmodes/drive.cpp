@@ -1,6 +1,4 @@
 #include "drive.h"
-#include "../utils/kinematics/drivetrain.h"
-#include "../utils/constants.h"
 
 extern "C"
 JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_Drive_runOpMode(JNIEnv *p_jni, jobject self) {
@@ -8,102 +6,52 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_Drive_runOpMo
 }
 
 void Drive::runOpMode() {
-    this->drivetrain = {
-        this->hardwareMap->getDcMotor("front_left"),
-        this->hardwareMap->getDcMotor("front_right"),
-        this->hardwareMap->getDcMotor("back_left"),
-        this->hardwareMap->getDcMotor("back_right")
-    };
-
-    this->drivetrain.front_left->setDirection(C_DcMotor::C_Direction::REVERSE);
-    this->drivetrain.front_right->setDirection(C_DcMotor::C_Direction::REVERSE);
-    this->drivetrain.back_right->setDirection(C_DcMotor::C_Direction::REVERSE);
-
-    this->lift_1 = this->hardwareMap->getDcMotor("lift_1");
-    this->lift_2 = this->hardwareMap->getDcMotor("lift_2");
-    this->lift_2->setDirection(C_DcMotor::C_Direction::REVERSE);
-
-    this->extend_motor = this->hardwareMap->getDcMotor("extend");
-    this->extend_motor->setDirection(C_DcMotor::C_Direction::REVERSE);
-
-    this->extend_motor->setTargetPosition(EXTEND2_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
-    this->extend_motor->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-    this->extend_motor->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-
-    this->rotate_servo = this->hardwareMap->getServo("rotate");
-    this->pickup_servo = this->hardwareMap->getServo("pickup");
-    this->basket_servo = this->hardwareMap->getServo("basket");
-
+    this->robot = new Robot(this);
 
     this->waitForStart();
 
-    this->rotate_position = ROTATE_SERVO_UP;
-    this->pickup_position = PICKUP_SERVO_CLOSED;
-    this->basket_position = BASKET_SERVO_COLLECT;
-    this->extend_power = EXTEND_BACK_POWER;
-
     while (this->opModeIsActive()) {
-        this->moveBase();
+        this->move_base();
 
-        // anything not set in a loop dies
-        // when the battery level is too low
-        // hence, we store state manually
+#ifndef PRACTICE_BOT // ONLY RUNS ON REAL BOT
+        this->robot->rotate_servo->setPosition(this->rotate_position);
+        this->robot->pickup_servo->setPosition(this->pickup_position);
+        this->robot->basket_servo->setPosition(this->basket_position);
 
-        this->rotate_servo->setPosition(this->rotate_position);
-        this->pickup_servo->setPosition(this->pickup_position);
-        this->basket_servo->setPosition(this->basket_position);
-        this->extend_motor->setPower(this->extend_power);
+        this->robot->extend_motor->setTargetPosition(this->extend_target_position);
+        this->robot->extend_motor->setPower(this->extend_power);
 
         this->collection();
         this->placement();
+#endif
     }
 }
 
-void Drive::moveBase() {
-    this->drivetrain.drive(
+void Drive::move_base() {
+    this->robot->drivetrain->drive(maths::vec3{
         -this->gamepad1->left_stick_y(),
+        this->gamepad1->right_stick_x() * DRIVETRAIN_TURN_MLT,
         this->gamepad1->left_stick_x(),
-        this->gamepad1->right_stick_x() * DRIVETRAIN_TURN_MLT
-    );
+    });
 
     if (this->gamepad1->left_bumper()) {
-        this->drivetrain.multiplier = DRIVETRAIN_SLOW_MLT;
+        this->robot->drivetrain->multiplier = DRIVETRAIN_FAST_MLT;
     } else if (this->gamepad1->right_bumper()) {
-        this->drivetrain.multiplier = DRIVETRAIN_FAST_MLT;
+        this->robot->drivetrain->multiplier = DRIVETRAIN_SLOW_MLT;
     }
 }
 
-void Drive::extendExtension() {
-    this->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / 360.0 * EXTEND_TICKS_PER_REV);
-    this->extend_power = EXTEND_FORW_POWER;
-}
-
-void Drive::retractExtension() {
-    this->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
-    this->extend_power = EXTEND_BACK_POWER;
-}
-
-// collection is driver 1's responsibility...
 void Drive::collection() {
-    // extend rides until stall (may drain power)
-    // bad? yes. reliable? very
-
-    // i prefer devving with xbox gamepad buttons
-    // A = down, B = right, Y = up, X = left
-    if (this->gamepad2->dpad_up()) { // far away pickup
-        this->extendExtension();
-
-
-    } else if (this->gamepad2->dpad_down()) { // retract + deposit into basket
-        this->retractExtension();
+    if (this->gamepad2->dpad_up()) {
+        this->extend_arm();
+    } else if (this->gamepad2->dpad_down()) {
+        this->retract_arm();
 
         this->rotate_position = ROTATE_SERVO_UP;
-        this->pickup_position = PICKUP_SERVO_CLOSED; // safety, prevents potential damage to basket
-    } else if (this->gamepad2->dpad_left()) { // middle position, any gamepad to allow fast lifting
+        this->pickup_position = PICKUP_SERVO_CLOSED;
+    } else if (this->gamepad2->dpad_left()) {
         this->rotate_position = ROTATE_SERVO_MID;
-    } else if (this->gamepad2->dpad_right()) { // close-up pickup
-
-
+    } else if (this->gamepad2->dpad_right()) {
         this->rotate_position = ROTATE_SERVO_DOWN;
     }
 
@@ -114,33 +62,32 @@ void Drive::collection() {
     }
 }
 
-// ...while placement is driver 2's responsibility
 void Drive::placement() {
     float lift_power = -this->gamepad2->left_stick_y();
 
     if (lift_power == 0.0) {
-        if (this->lift_1->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
-            this->lift_1->setTargetPosition(this->lift_1->getCurrentPosition());
+        if (this->robot->lift_1->getMode() != C_DcMotor::RUN_TO_POSITION) {
+            this->robot->lift_1->setTargetPosition(this->robot->lift_1->getCurrentPosition());
         }
 
-        if (this->lift_2->getMode() != C_DcMotor::C_RunMode::RUN_TO_POSITION) {
-            this->lift_2->setTargetPosition(this->lift_2->getCurrentPosition());
+        if (this->robot->lift_2->getMode() != C_DcMotor::RUN_TO_POSITION) {
+            this->robot->lift_2->setTargetPosition(this->robot->lift_2->getCurrentPosition());
         }
 
-        this->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-        this->lift_1->setPower(LIFT_HOLD_POWER);
+        this->robot->lift_1->setMode(C_DcMotor::RUN_TO_POSITION);
+        this->robot->lift_1->setPower(LIFT_HOLD_POWER);
 
-        this->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
-        this->lift_2->setPower(LIFT_HOLD_POWER);
+        this->robot->lift_2->setMode(C_DcMotor::RUN_TO_POSITION);
+        this->robot->lift_2->setPower(LIFT_HOLD_POWER);
     } else {
         if (lift_power > 0.0) lift_power *= LIFT_UP_MLT;
         else lift_power *= LIFT_DOWN_MLT;
 
-        this->lift_1->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-        this->lift_1->setPower(lift_power);
+        this->robot->lift_1->setMode(C_DcMotor::RUN_WITHOUT_ENCODER);
+        this->robot->lift_1->setPower(lift_power);
 
-        this->lift_2->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-        this->lift_2->setPower(lift_power);
+        this->robot->lift_2->setMode(C_DcMotor::RUN_WITHOUT_ENCODER);
+        this->robot->lift_2->setPower(lift_power);
     }
 
     if (this->gamepad2->right_bumper()) {
@@ -150,4 +97,14 @@ void Drive::placement() {
     } else if (this->gamepad2->left_bumper()) {
         this->basket_position = BASKET_SERVO_COLLECT;
     }
+}
+
+void Drive::extend_arm() {
+    this->extend_target_position = EXTEND_MAX_DEGREES / 360.0 * EXTEND_TICKS_PER_REV;
+    this->extend_power = EXTEND_FORW_POWER;
+}
+
+void Drive::retract_arm() {
+    this->extend_target_position = EXTEND_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV;
+    this->extend_power = EXTEND_BACK_POWER;
 }

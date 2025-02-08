@@ -1,40 +1,27 @@
 #include "drivetrain.h"
 
-void Drivetrain::drive(double forward_power, double turn_power) const {
-    if (turn_power > 1.0) turn_power = 1.0;
-    else if (turn_power < -1.0) turn_power = -1.0;
-
-    if (forward_power > 1.0) forward_power = 1.0;
-    else if (forward_power < -1.0) forward_power = -1.0;
-
-    forward_power *= 1 - std::abs(turn_power);
-
-    if (front_left != nullptr) front_left->setPower((forward_power + turn_power) * this->multiplier);
-    if (front_right != nullptr) front_right->setPower((forward_power - turn_power) * this->multiplier);
-    if (back_left != nullptr) back_left->setPower((forward_power + turn_power) * this->multiplier);
-    if (back_right != nullptr) back_right->setPower((forward_power - turn_power) * this->multiplier);
+Drivetrain::Drivetrain(C_DcMotor *front_left, C_DcMotor *front_right, C_DcMotor *back_left, C_DcMotor *back_right) {
+    this->front_left = front_left;
+    this->front_right = front_right;
+    this->back_left = back_left;
+    this->back_right = back_right;
 }
 
-void Drivetrain::drive(double forward_power, double strafe_power, double turn_power) const {
-    double magnitude = std::hypot(forward_power, strafe_power);
-    double direction = std::atan2(forward_power, strafe_power);
+void Drivetrain::drive(maths::vec3 power) {
+    double direction = std::atan2(power[0], power[2]);
+    double magnitude = std::hypot(power[0], power[2]);
 
-    if (magnitude > 1.0) magnitude = 1.0;
+    magnitude -= std::abs(power[1]);
+    magnitude *= this->multiplier;
 
-    if (turn_power > 1.0) turn_power = 1.0;
-    else if (turn_power < -1.0) turn_power = -1.0;
-
-    magnitude *= 1 - std::abs(turn_power);
-
-    math::vec2 v{
-        magnitude,
-        0.0
+    maths::vec3 motor_powers{
+        std::cos(direction) * magnitude - std::sin(direction) * magnitude, // (strafe) left + right
+        power[1] * this->multiplier, // (turn) left + right
+        std::sin(direction) * magnitude + std::cos(direction) * magnitude, // forward + back
     };
 
-    v.rotate(direction);
-
-    if (front_left != nullptr) front_left->setPower((v.y + v.x + turn_power) * this->multiplier);
-    if (front_right != nullptr) front_right->setPower((v.y - v.x - turn_power) * this->multiplier);
-    if (back_left != nullptr) back_left->setPower((v.y - v.x + turn_power) * this->multiplier);
-    if (back_right != nullptr) back_right->setPower((v.y + v.x - turn_power) * this->multiplier);
+    if (this->front_left) this->front_left->setPower   (motor_powers[2] + motor_powers[1] + motor_powers[0]);
+    if (this->front_right) this->front_right->setPower (motor_powers[2] - motor_powers[1] - motor_powers[0]);
+    if (this->back_left) this->back_left->setPower     (motor_powers[2] + motor_powers[1] - motor_powers[0]);
+    if (this->back_right) this->back_right->setPower   (motor_powers[2] - motor_powers[1] + motor_powers[0]);
 }

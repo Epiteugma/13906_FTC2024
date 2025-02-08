@@ -1,36 +1,24 @@
-#include "../lib/c_op_mode.h"
-#include "../utils/kinematics/drivetrain.h"
+#pragma once
+#include <robot.h>
+#include <lib/c_op_mode.h>
 
 class Drive : C_OpMode {
     using C_OpMode::C_OpMode;
-
-    Drivetrain drivetrain{};
-
-    C_DcMotor *lift_1;
-    C_DcMotor *lift_2;
-
-    C_DcMotor *extend_motor;
-
-    C_Servo *rotate_servo;
-    C_Servo *pickup_servo;
-    C_Servo *basket_servo;
-
-    C_TouchSensor *extendMag;
-    C_TouchSensor *retractMag;
-
-
+    Robot *robot;
 
     double rotate_position;
     double pickup_position;
     double basket_position;
-    double extend_power;
 
-    void moveBase();
+    int extend_target_position;
+    double extend_power;
+public:
+    void runOpMode() override;
+
+    void move_base();
     void collection();
     void placement();
 
-    void extendExtension();
-    void retractExtension();
-public:
-    void runOpMode() override;
+    void extend_arm();
+    void retract_arm();
 };

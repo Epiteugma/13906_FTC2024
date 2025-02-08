@@ -1,19 +1,14 @@
 #pragma once
-#include "chrono"
+#include <chrono>
+#include <utils/maths.h>
 
-using std::chrono::time_point;
-using std::chrono::high_resolution_clock;
-using std::chrono::duration;
+class PID {
+    double it = 0.0;
+    double p_error = 0.0;
+public:
+    maths::vec3 coefficients;
+    PID(double kP, double kI, double kD);
 
-struct PID {
-    double kP = 1.0;
-    double kI = 0.0;
-    double kD = 0.0;
-
-    double It = 0.0;
-    double last_error = 0.0;
-    time_point<high_resolution_clock> last_update = high_resolution_clock::now();
-
-    double update(double target, double current);
+    double update(double error, std::chrono::duration<double> delta_time = std::chrono::duration<double>(0.0));
     void reset();
 };

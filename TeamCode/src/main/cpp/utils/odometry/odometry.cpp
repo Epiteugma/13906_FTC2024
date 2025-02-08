@@ -1,68 +1,69 @@
 #include "odometry.h"
 
-void Odometry::update() {
-    auto now = high_resolution_clock::now();
+Odometry::Odometry(C_DcMotor *left_encoder, C_DcMotor *right_encoder, C_DcMotor *perp_encoder, double track_width, double perp_offset) {
+    this->left_encoder = left_encoder;
+    this->right_encoder = right_encoder;
+    this->perp_encoder = perp_encoder;
 
-    int delta_left = this->left->getCurrentPosition() - this->last_left;
-    int delta_right = this->right->getCurrentPosition() - this->last_right;
-    int delta_perp = this->perp == nullptr ? 0 : this->perp->getCurrentPosition() - this->last_perp;
-    duration<double> delta_time = now - this->last_update;
-
-    this->last_left += delta_left;
-    this->last_right += delta_right;
-    this->last_perp += delta_perp;
-    this->last_update = now;
-
-    double phi = (delta_right - delta_left) / this->track_width;
-
-    //math::vec2 robot_relative = {
-    //    std::sin(this->theta + delta_time.count() * phi) - std::sin(this->theta),
-    //    -std::cos(this->theta + delta_time.count() * phi) + std::cos(this->theta)
-    //};
-
-    math::vec2 robot_relative{
-        delta_perp + (phi * this->perp_offset),
-        (delta_right + delta_left) / 2.0,
-    };
-
-    double phi_integrator[] = {
-        std::sin(phi) / phi, (std::cos(phi) - 1) / phi,
-        (-std::cos(phi) + 1) / phi, std::sin(phi) / phi
-    };
-
-    if (phi == 0.0) {
-        phi_integrator[0] = 1.0;
-        phi_integrator[1] = 0.0;
-        phi_integrator[2] = 0.0;
-        phi_integrator[3] = 1.0;
-    }
-
-    math::vec2 field_relative{
-        phi_integrator[0] * robot_relative.x + phi_integrator[1] * robot_relative.y,
-        phi_integrator[2] * robot_relative.x + phi_integrator[3] * robot_relative.y,
-    };
-
-    field_relative.rotate(this->theta);
-
-    this->velocity.x = field_relative.x / delta_time.count();
-    this->velocity.y = field_relative.y / delta_time.count();
-
-    this->pos.x += field_relative.x;
-    this->pos.y += field_relative.y;
-    this->theta += phi;
+    this->track_width = track_width;
+    this->perp_offset = perp_offset;
 }
 
-void Odometry::init() {
-    this->left->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-    this->left->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+void Odometry::update() {
+    maths::vec3 encoder_values{
+        (double) this->left_encoder->getCurrentPosition(),
+        (double) this->right_encoder->getCurrentPosition(),
+        (double) (!this->perp_encoder ? 0.0 : this->perp_encoder->getCurrentPosition()),
+    };
 
-    this->right->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-    this->right->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
+    maths::vec3 encoder_deltas{
+        encoder_values[0] - this->last_encoder_values[0],
+        encoder_values[1] - this->last_encoder_values[1],
+        encoder_values[2] - this->last_encoder_values[2],
+    };
 
-    if (this->perp != nullptr) {
-        this->perp->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-        this->perp->setMode(C_DcMotor::C_RunMode::RUN_WITHOUT_ENCODER);
-    }
+    this->last_encoder_values[0] = encoder_values[0];
+    this->last_encoder_values[1] = encoder_values[1];
+    this->last_encoder_values[2] = encoder_values[2];
 
-    this->last_update = high_resolution_clock::now();
+    double phi = (encoder_deltas[0] - encoder_deltas[1]) / this->track_width;
+
+    maths::vec3 deltas{
+        encoder_deltas[2] + this->perp_offset * phi,
+        (encoder_deltas[0] + encoder_deltas[1]) / 2,
+        phi,
+    };
+
+    maths::mat integrator(2, 2);
+
+    integrator[0][0] = phi == 0.0 ? 1.0 : -std::sin(phi) / phi;
+    integrator[0][1] = phi == 0.0 ? 0.0 : (std::cos(phi) - 1) / phi;
+    integrator[1][0] = phi == 0.0 ? 0.0 : (-std::cos(phi) + 1) / phi;
+    integrator[1][1] = phi == 0.0 ? 1.0 : -std::sin(phi) / phi;
+
+    maths::vec3 integrated_deltas{
+        integrator[0][0] * deltas[0] + integrator[0][1] * deltas[1],
+        integrator[1][0] * deltas[0] + integrator[1][1] * deltas[1],
+        phi,
+    };
+
+    maths::vec3 field_deltas{
+        std::cos(this->position[2]) * integrated_deltas[0] - std::sin(this->position[2]) * integrated_deltas[1],
+        std::sin(this->position[2]) * integrated_deltas[0] + std::cos(this->position[2]) * integrated_deltas[1],
+        phi,
+    };
+
+    this->position[0] += field_deltas[0];
+    this->position[1] += field_deltas[1];
+    this->position[2] += field_deltas[2];
+}
+
+void Odometry::reset() {
+    this->position[0] = 0.0;
+    this->position[1] = 0.0;
+    this->position[2] = 0.0;
+
+    this->last_encoder_values[0] = (double) this->left_encoder->getCurrentPosition();
+    this->last_encoder_values[1] = (double) this->right_encoder->getCurrentPosition();
+    this->last_encoder_values[2] = (double) (!this->perp_encoder ? 0.0 : this->perp_encoder->getCurrentPosition());
 }
