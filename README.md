@@ -295,7 +295,7 @@ The readme.md file located in the [/TeamCode/src/main/java/org/firstinspires/ftc
     * [AprilTag Introduction](https://ftc-docs.firstinspires.org/apriltag-intro)
     * [AprilTag SDK Guide](https://ftc-docs.firstinspires.org/apriltag-sdk)
     * [AprilTag Detection Values](https://ftc-docs.firstinspires.org/apriltag-detection-values)
-    * [AprilTag Test Images](https://ftc-docs.firstinspires.org/apriltag-test-images)
+    * [AprilTag RegressorTest Images](https://ftc-docs.firstinspires.org/apriltag-test-images)
     * [Camera Calibration](https://ftc-docs.firstinspires.org/camera-calibration)
 * Adds Driver Station support for Logitech Dual Action and Sony PS5 DualSense gamepads.
     * This **does not** include support for the Sony PS5 DualSense Edge gamepad.

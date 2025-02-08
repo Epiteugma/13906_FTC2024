@@ -111,7 +111,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
 
         telemetry.addData(">", "Press START to start tests");
-        telemetry.addData(">", "Test results will update for each access method.");
+        telemetry.addData(">", "RegressorTest results will update for each access method.");
         telemetry.update();
         waitForStart();
 
@@ -122,7 +122,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
         // This is the same as using LynxModule.BulkCachingMode.OFF
         // --------------------------------------------------------------------------------------
 
-        displayCycleTimes("Test 1 of 3 (Wait for completion)");
+        displayCycleTimes("RegressorTest 1 of 3 (Wait for completion)");
 
         timer.reset();
         cycles = 0;
@@ -142,7 +142,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
         }
         // calculate the average cycle time.
         t1 = timer.milliseconds() / cycles;
-        displayCycleTimes("Test 2 of 3 (Wait for completion)");
+        displayCycleTimes("RegressorTest 2 of 3 (Wait for completion)");
 
         // --------------------------------------------------------------------------------------
         // Run test cycles using AUTO cache mode
@@ -172,7 +172,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
         }
         // calculate the average cycle time.
         t2 = timer.milliseconds() / cycles;
-        displayCycleTimes("Test 3 of 3 (Wait for completion)");
+        displayCycleTimes("RegressorTest 3 of 3 (Wait for completion)");
 
         // --------------------------------------------------------------------------------------
         // Run test cycles using MANUAL cache mode
