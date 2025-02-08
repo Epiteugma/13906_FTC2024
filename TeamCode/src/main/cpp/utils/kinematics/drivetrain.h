@@ -13,5 +13,5 @@ public:
     C_DcMotor *back_right;
 
     Drivetrain(C_DcMotor *front_left, C_DcMotor *front_right, C_DcMotor *back_left, C_DcMotor *back_right);
-    void drive(maths::vec3 power);
+    void drive(maths::vec3 power) const;
 };

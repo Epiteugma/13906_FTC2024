@@ -24,6 +24,8 @@ add_library(teamcode SHARED
         opmodes/auton.cpp
         opmodes/auton_place.cpp
         opmodes/auton_park.cpp
+
+        robot.cpp
 )
 
 target_include_directories(teamcode PRIVATE .)

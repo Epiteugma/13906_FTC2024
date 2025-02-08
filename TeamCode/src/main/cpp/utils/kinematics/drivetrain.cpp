@@ -7,7 +7,7 @@ Drivetrain::Drivetrain(C_DcMotor *front_left, C_DcMotor *front_right, C_DcMotor 
     this->back_right = back_right;
 }
 
-void Drivetrain::drive(maths::vec3 power) {
+void Drivetrain::drive(maths::vec3 power) const {
     double direction = std::atan2(power[0], power[2]);
     double magnitude = std::hypot(power[0], power[2]);
 

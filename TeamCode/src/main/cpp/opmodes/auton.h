@@ -11,7 +11,8 @@ class Auton : public C_OpMode {
     PID *pid_x;
     PID *pid_y;
     PID *pid_z;
-    maths::vec3 pid_values;
+
+    maths::vec3 pid_values{};
 
     std::vector<double> path;
     std::vector<AutonAction> actions;
@@ -19,7 +20,7 @@ class Auton : public C_OpMode {
     int node_index;
     int action_index;
 
-    maths::vec3 target;
+    maths::vec3 target{};
 
     void printDebugInfo();
 public:

@@ -15,6 +15,8 @@ Auton::Auton(
 
     this->node_index = 0;
     this->action_index = -1;
+
+    this->robot = nullptr;
 }
 
 void Auton::runOpMode() {
