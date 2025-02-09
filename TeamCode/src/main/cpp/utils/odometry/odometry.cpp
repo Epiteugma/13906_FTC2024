@@ -1,5 +1,4 @@
 #include "odometry.h"
-#include <android/log.h>
 
 Odometry::Odometry(C_DcMotor *left_encoder, C_DcMotor *right_encoder, C_DcMotor *perp_encoder, double track_width, double perp_offset) {
     this->left_encoder = left_encoder;
