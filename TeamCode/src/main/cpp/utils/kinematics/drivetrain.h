@@ -1,15 +1,17 @@
 #pragma once
-#include "../../lib/hardware/c_dc_motor.h"
-#include "../../utils/maths.h"
+#include <cmath>
+#include <lib/hardware/c_dc_motor.h>
+#include <utils/maths.h>
 
-struct Drivetrain {
-    C_DcMotor *front_left{};
-    C_DcMotor *front_right{};
-    C_DcMotor *back_left{};
-    C_DcMotor *back_right{};
-
+class Drivetrain {
+public:
     double multiplier = 1.0;
 
-    void drive(double forward_power, double turn_power) const;
-    void drive(double forward_power, double strafe_power, double turn_power) const;
+    C_DcMotor *front_left;
+    C_DcMotor *front_right;
+    C_DcMotor *back_left;
+    C_DcMotor *back_right;
+
+    Drivetrain(C_DcMotor *front_left, C_DcMotor *front_right, C_DcMotor *back_left, C_DcMotor *back_right);
+    void drive(maths::vec3 power) const;
 };

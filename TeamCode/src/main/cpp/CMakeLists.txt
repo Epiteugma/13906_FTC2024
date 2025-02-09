@@ -12,21 +12,23 @@ add_library(teamcode SHARED
         lib/hardware/c_servo.cpp
         lib/hardware/c_touchsensor.cpp
 
-        utils/kinematics/drivetrain.cpp
+        utils/utils.cpp
         utils/maths.cpp
+        utils/kinematics/drivetrain.cpp
         utils/odometry/odometry.cpp
         utils/control/pid.cpp
-        utils/utils.cpp
-
-        profiles/profiles.cpp
 
         opmodes/drive.cpp
         opmodes/servo_tuner.cpp
-        opmodes/regressor_test.cpp
+
         opmodes/auton.cpp
         opmodes/auton_place.cpp
         opmodes/auton_park.cpp
+
+        robot.cpp
 )
+
+target_include_directories(teamcode PRIVATE .)
 
 target_link_libraries(teamcode
     android

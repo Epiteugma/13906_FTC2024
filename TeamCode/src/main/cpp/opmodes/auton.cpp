@@ -1,11 +1,9 @@
 #include "auton.h"
 
-#include <utility>
-
 Auton::Auton(
     JNIEnv *p_jni, jobject self,
-    PID pid_x, PID pid_y, PID pid_z,
-    std::vector<math::vec3> path,
+    PID *pid_x, PID *pid_y, PID *pid_z,
+    std::vector<double> path,
     std::vector<AutonAction> actions
 ) : C_OpMode(p_jni, self) {
     this->pid_x = pid_x;
@@ -17,88 +15,64 @@ Auton::Auton(
 
     this->node_index = 0;
     this->action_index = -1;
-}
 
-void Auton::init() {
-    this->drivetrain = {
-        this->hardwareMap->getDcMotor("front_left"),
-        this->hardwareMap->getDcMotor("front_right"),
-        this->hardwareMap->getDcMotor("back_left"),
-        this->hardwareMap->getDcMotor("back_right")
-    };
-
-    this->lift_1 = this->hardwareMap->getDcMotor("lift_1");
-    this->lift_2 = this->hardwareMap->getDcMotor("lift_2");
-    this->lift_2->setDirection(C_DcMotor::C_Direction::REVERSE);
-
-    this->rotate_servo = this->hardwareMap->getServo("rotate");
-    this->pickup_servo = this->hardwareMap->getServo("pickup");
-    this->basket_servo = this->hardwareMap->getServo("basket");
-
-    this->drivetrain.front_left->setDirection(C_DcMotor::C_Direction::REVERSE);
-    this->drivetrain.front_right->setDirection(C_DcMotor::C_Direction::REVERSE);
-    this->drivetrain.back_right->setDirection(C_DcMotor::C_Direction::REVERSE);
-
-    this->odometry = {
-        this->drivetrain.back_left,
-        this->hardwareMap->getDcMotor("right_encoder"),
-        drivetrain.front_left,
-        17.0 * ODOMETRY_TICKS_PER_CM,
-        12.5 * ODOMETRY_TICKS_PER_CM
-    };
-
-    this->odometry.right->setDirection(C_DcMotor::C_Direction::REVERSE);
-
-    this->extend_motor = this->hardwareMap->getDcMotor("extend");
-    this->extend_motor->setDirection(C_DcMotor::C_Direction::REVERSE);
-
-    this->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
-    this->extend_motor->setMode(C_DcMotor::C_RunMode::STOP_AND_RESET_ENCODER);
-    this->extend_motor->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
+    this->robot = nullptr;
 }
 
 void Auton::runOpMode() {
-    this->init();
+    this->robot = new Robot(this);
 
     this->waitForStart();
-    this->odometry.init();
 
     for (auto &action : this->actions) {
         if (action.at_node != -1) continue;
         action.run(action, this);
     }
 
-    while (this->opModeIsActive()) {
-        this->odometry.update();
-        this->printDebugInfo();
-        this->target = this->path[this->node_index];
+    auto last = std::chrono::high_resolution_clock::now();
 
-        this->pid_values = {
-            this->pid_x.update(this->target.x, this->odometry.pos.x / ODOMETRY_TICKS_PER_CM),
-            this->pid_y.update(this->target.y, this->odometry.pos.y / ODOMETRY_TICKS_PER_CM),
-            this->pid_z.update(this->target.z, -this->odometry.theta / M_PI * 180.0),
+    while (this->opModeIsActive()) {
+        auto now = std::chrono::high_resolution_clock::now();
+        auto delta = now - last;
+        last = now;
+
+        this->robot->odometry->update();
+        this->printDebugInfo();
+
+        this->target[0] = this->path[this->node_index * 3];
+        this->target[1] = this->path[this->node_index * 3 + 1];
+        this->target[2] = this->path[this->node_index * 3 + 2];
+
+        double theta = this->robot->odometry->position[2];
+
+        maths::vec3 errors{
+            this->target[0] - (this->robot->odometry->position[0] / ODOMETRY_TICKS_PER_CM),
+            this->target[1] - (this->robot->odometry->position[1] / ODOMETRY_TICKS_PER_CM),
+            this->target[2] + (theta / M_PI * 180.0)
         };
 
-        math::vec2 xy = this->pid_values.xy();
-        xy.rotate(-this->odometry.theta);
+        this->pid_values[0] = this->pid_x->update(errors[0], delta);
+        this->pid_values[1] = this->pid_y->update(errors[1], delta);
+        this->pid_values[2] = this->pid_z->update(errors[2], delta);
 
-        this->pid_values.x = xy.x;
-        this->pid_values.y = xy.y;
+        maths::vec2 rotated_pid_values{
+            std::cos(-theta) * this->pid_values[0] - std::sin(-theta) * this->pid_values[1],
+            std::sin(-theta) * this->pid_values[0] + std::cos(-theta) * this->pid_values[1]
+        };
 
-        this->drivetrain.drive(
-            this->pid_values.y,
-            this->pid_values.x,
-            this->pid_values.z
-        );
+        this->pid_values[0] = rotated_pid_values[0];
+        this->pid_values[1] = rotated_pid_values[1];
 
-        double turn_err = std::abs(this->target.z + this->odometry.theta / M_PI * 180);
-        double x_err = std::abs(this->target.x - (this->odometry.pos.x / ODOMETRY_TICKS_PER_CM));
-        double y_err = std::abs(this->target.y - (this->odometry.pos.y / ODOMETRY_TICKS_PER_CM));
+        this->robot->drivetrain->drive(maths::vec3{
+            this->pid_values[1], // forward
+            this->pid_values[2], // turn
+            this->pid_values[0], // strafe
+        });
 
         if (
-            turn_err < AUTON_PID_TH_THRESHOLD &&
-            x_err    < AUTON_PID_X_THRESHOLD &&
-            y_err    < AUTON_PID_Y_THRESHOLD
+            std::abs(errors[0]) < AUTON_PID_X_THRESHOLD &&
+            std::abs(errors[1]) < AUTON_PID_Y_THRESHOLD &&
+            std::abs(errors[2]) < AUTON_PID_TH_THRESHOLD
         ) {
             this->action_index = -1;
 
@@ -117,10 +91,10 @@ void Auton::runOpMode() {
                 }
             }
 
-            if (action_index == -1) node_index++;
+            if (this->action_index == -1) this->node_index++;
 
-            if (node_index >= this->path.size()) {
-                node_index = (int) (this->path.size() - 1);
+            if (node_index >= this->path.size() / 3) {
+                node_index = (int) ((this->path.size() / 3) - 1);
             }
         }
 
@@ -130,26 +104,29 @@ void Auton::runOpMode() {
 
 void Auton::printDebugInfo() {
     this->telemetry->addLine(utils::sprintf(
-        "(position) x = %.2f; y = %.2f; θ = %.2f",
-        odometry.pos.x / ODOMETRY_TICKS_PER_CM,
-        odometry.pos.y / ODOMETRY_TICKS_PER_CM,
-        odometry.theta / M_PI * 180.0
+            "(position) x = %.2f; y = %.2f; θ = %.2f",
+            this->robot->odometry->position[0] / ODOMETRY_TICKS_PER_CM,
+            this->robot->odometry->position[1] / ODOMETRY_TICKS_PER_CM,
+            this->robot->odometry->position[2] / M_PI * 180.0
     ));
 
     this->telemetry->addLine(utils::sprintf(
-        "(velocity) x = %.2f; y = %.2f",
-        odometry.velocity.x / (ODOMETRY_TICKS_PER_CM * 100.0), // ms-1
-        odometry.velocity.y / (ODOMETRY_TICKS_PER_CM * 100.0)
+            "(target) x = %.2f; y = %.2f; θ = %.2f",
+            this->path[this->node_index * 3],
+            this->path[this->node_index * 3 + 1],
+            this->path[this->node_index * 3 + 2]
     ));
 
     this->telemetry->addLine();
-    this->telemetry->addLine(utils::sprintf("forward_power = %.2f", this->pid_values.x));
-    this->telemetry->addLine(utils::sprintf("strafe_power = %.2f", this->pid_values.y));
-    this->telemetry->addLine(utils::sprintf("turn_power = %.2f", this->pid_values.z));
+    this->telemetry->addLine(utils::sprintf("forward_power = %.2f", this->pid_values[1]));
+    this->telemetry->addLine(utils::sprintf("strafe_power = %.2f", this->pid_values[0]));
+    this->telemetry->addLine(utils::sprintf("turn_power = %.2f", this->pid_values[2]));
 
+#ifndef PRACTICE_BOT
     this->telemetry->addLine();
-    this->telemetry->addLine(utils::sprintf("lift_1 power = %.2f", this->lift_1->getPower()));
-    this->telemetry->addLine(utils::sprintf("lift_2 power = %.2f", this->lift_2->getPower()));
+    this->telemetry->addLine(utils::sprintf("lift_1 power = %.2f", this->robot->lift_1->getPower()));
+    this->telemetry->addLine(utils::sprintf("lift_2 power = %.2f", this->robot->lift_2->getPower()));
+#endif
 
     this->telemetry->addLine();
     this->telemetry->addLine(utils::sprintf("node index = %d", this->node_index));

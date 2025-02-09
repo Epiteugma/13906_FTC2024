@@ -1,31 +1,23 @@
 #pragma once
-#include "../../lib/hardware/c_dc_motor.h"
-#include "../maths.h"
-#include "chrono"
-#include "../../lib/c_telemetry.h"
-#include "../utils.h"
+#include <cmath>
+#include <lib/hardware/c_dc_motor.h>
+#include <utils/maths.h>
 
-using std::chrono::time_point;
-using std::chrono::high_resolution_clock;
-using std::chrono::duration;
+class Odometry {
+    maths::vec3 last_encoder_values{};
+public:
+    C_DcMotor *left_encoder;
+    C_DcMotor *right_encoder;
+    C_DcMotor *perp_encoder;
 
-struct Odometry {
-    C_DcMotor *left{};
-    C_DcMotor *right{};
-    C_DcMotor *perp{};
+    double track_width;
+    double perp_offset;
+    bool enable_integrator = true;
 
-    double track_width = 0.0;
-    double perp_offset = 0.0;
+    Odometry(C_DcMotor *left_encoder, C_DcMotor *right_encoder, C_DcMotor *perp_encoder, double track_width, double perp_offset);
 
-    math::vec2 pos{};
-    math::vec2 velocity{};
-    double theta = 0.0;
+    maths::vec3 position{};
 
-    void init();
     void update();
-
-    int last_left = 0;
-    int last_right = 0;
-    int last_perp = 0;
-    time_point<high_resolution_clock> last_update = high_resolution_clock::now();
+    void reset();
 };

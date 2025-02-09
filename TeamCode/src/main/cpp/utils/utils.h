@@ -2,5 +2,6 @@
 #include "string"
 
 namespace utils {
-    std::string sprintf(std::string format, ...) __overloadable;
+    __printflike(1, 2)
+    std::string sprintf(const char *format, ...) __overloadable;
 }
