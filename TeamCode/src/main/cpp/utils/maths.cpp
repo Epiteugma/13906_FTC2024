@@ -27,6 +27,27 @@ const double *maths::mat::operator[](int row) const {
     return this->data.get() + row * this->cols;
 }
 
+maths::mat maths::mat::operator*(maths::mat &other) const {
+    mat out(this->rows, other.get_cols());
+
+    if (this->cols != other.get_rows()) return out;
+
+    for (int i = 0; i < out.get_rows() * out.get_cols(); i++) {
+        int row = i / out.get_cols();
+        int col = i % out.get_cols();
+
+        double out_value = 0.0;
+
+        for (int j = 0; j < this->cols; j++) {
+            out_value += this->data[row * this->cols + j] * other[j][col];
+        }
+
+        out[row][col] = out_value;
+    }
+
+    return out;
+}
+
 maths::mat maths::mat::inverse() {
     if (this->rows != this->cols) return {this->rows, this->cols};
 
@@ -69,6 +90,19 @@ maths::mat maths::mat::inverse() {
                 out[row][col - this->cols] = augmented[row][col];
             }
         }
+    }
+
+    return out;
+}
+
+maths::mat maths::mat::transpose() {
+    mat out(this->cols, this->rows);
+
+    for (int i = 0; i < this->rows * this->cols; i++) {
+        int row = i / this->cols;
+        int col = i % this->cols;
+
+        out[col][row] = this->data[row * this->cols + col];
     }
 
     return out;

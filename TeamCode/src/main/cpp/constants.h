@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 
-//#define PRACTICE_BOT
+#define PRACTICE_BOT
 
 #ifdef PRACTICE_BOT
 
@@ -36,7 +36,7 @@
 #define ROTATE_SERVO_MID  0.5
 #define ROTATE_SERVO_DOWN 0.03
 
-#define PICKUP_SERVO_CLOSED 0.4
+#define PICKUP_SERVO_CLOSED 0.45
 #define PICKUP_SERVO_OPEN   0.0
 
 #define BASKET_SERVO_COLLECT 0.5

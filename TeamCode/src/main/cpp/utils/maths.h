@@ -18,7 +18,9 @@ namespace maths {
 
         double *operator[](int row);
         const double *operator[](int row) const;
+        mat operator*(mat &other) const;
 
         mat inverse();
+        mat transpose();
     };
 }

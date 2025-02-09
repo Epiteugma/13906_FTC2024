@@ -29,9 +29,15 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPark_run
 #endif
     };
 
+#ifndef PRACTICE_BOT // REAL BOT
     auto pid_x = new PID(1.0 / 20.0, 0.0, 0.0);
     auto pid_y = new PID(1.0 / 20.0, 0.0, 0.0);
     auto pid_z = new PID(1.0 / 20.0, 0.0, 0.0);
+#else // PRACTICE BOT
+    auto pid_x = new PID(1.0 / 100.0, 0.0, 0.0);
+    auto pid_y = new PID(1.0 / 100.0, 0.0, 0.0);
+    auto pid_z = new PID(1.0 / 40.0, 0.0, 0.0);
+#endif
 
     (new Auton(p_jni, self, pid_x, pid_y, pid_z, path, actions))->runOpMode();
 }

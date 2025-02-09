@@ -52,8 +52,10 @@ Robot::Robot(C_OpMode *op_mode) {
     this->rotate_servo = op_mode->hardwareMap->getServo("rotate");
     this->pickup_servo = op_mode->hardwareMap->getServo("pickup");
     this->basket_servo = op_mode->hardwareMap->getServo("basket");
+
+    // TODO: enable integrator in prod
+    this->odometry->enable_integrator = false;
 #endif
 
-    this->odometry->enable_integrator = false;
     this->odometry->reset();
 }
