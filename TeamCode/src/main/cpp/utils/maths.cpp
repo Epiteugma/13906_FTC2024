@@ -96,7 +96,12 @@ maths::mat maths::mat::inverse() {
 }
 
 maths::mat maths::mat::transpose() {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "ArgumentSelectionDefects"
+
     mat out(this->cols, this->rows);
+
+#pragma clang diagnostic pop
 
     for (int i = 0; i < this->rows * this->cols; i++) {
         int row = i / this->cols;
