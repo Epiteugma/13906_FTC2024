@@ -149,6 +149,11 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
             p_auton->robot->lift_1->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
             p_auton->robot->lift_2->setMode(C_DcMotor::C_RunMode::RUN_TO_POSITION);
 
+            p_auton->robot->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
+
+            p_auton->robot->extend_motor->setMode(C_DcMotor::STOP_AND_RESET_ENCODER);
+            p_auton->robot->extend_motor->setMode(C_DcMotor::RUN_TO_POSITION);
+
             p_auton->robot->extend_motor->setPower(1.0);
 
             p_auton->robot->rotate_servo->setPosition(ROTATE_SERVO_MID);

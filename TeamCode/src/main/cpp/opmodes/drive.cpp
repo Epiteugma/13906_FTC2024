@@ -10,6 +10,11 @@ void Drive::runOpMode() {
 
     this->waitForStart();
 
+    this->rotate_position = ROTATE_SERVO_UP;
+    this->pickup_position = PICKUP_SERVO_CLOSED;
+    this->basket_position = BASKET_SERVO_COLLECT;
+    this->retract_arm();
+
     while (this->opModeIsActive()) {
         this->move_base();
 

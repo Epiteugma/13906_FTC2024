@@ -12,12 +12,14 @@ void Drivetrain::drive(maths::vec3 power) const {
     double magnitude = std::hypot(power[0], power[2]);
 
     magnitude -= std::abs(power[1]);
+    if (magnitude < 0.0) magnitude = 0.0;
+
     magnitude *= this->multiplier;
 
     maths::vec3 motor_powers{
-        std::cos(direction) * magnitude - std::sin(direction) * magnitude, // (strafe) left + right
+        std::cos(direction) * magnitude, // (strafe) left + right
         power[1] * this->multiplier, // (turn) left + right
-        std::sin(direction) * magnitude + std::cos(direction) * magnitude, // forward + back
+        std::sin(direction) * magnitude, // forward + back
     };
 
     if (this->front_left) this->front_left->setPower   (motor_powers[2] + motor_powers[1] + motor_powers[0]);

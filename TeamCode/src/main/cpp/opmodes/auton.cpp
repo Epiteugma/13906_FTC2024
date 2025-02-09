@@ -39,15 +39,21 @@ void Auton::runOpMode() {
         this->robot->odometry->update();
         this->printDebugInfo();
 
-        this->target[0] = this->path[this->node_index];
-        this->target[1] = this->path[this->node_index + 1];
-        this->target[2] = this->path[this->node_index + 2];
+        this->target[0] = this->path[this->node_index * 3];
+        this->target[1] = this->path[this->node_index * 3 + 1];
+        this->target[2] = this->path[this->node_index * 3 + 2];
 
         double theta = this->robot->odometry->position[2];
 
-        this->pid_values[0] = this->pid_x->update(this->target[0] - (this->robot->odometry->position[0] / ODOMETRY_TICKS_PER_CM), delta);
-        this->pid_values[1] = this->pid_y->update(this->target[1] - (this->robot->odometry->position[1] / ODOMETRY_TICKS_PER_CM), delta);
-        this->pid_values[2] = this->pid_z->update(this->target[2] + (theta / M_PI * 180.0));
+        maths::vec3 errors{
+            this->target[0] - (this->robot->odometry->position[0] / ODOMETRY_TICKS_PER_CM),
+            this->target[1] - (this->robot->odometry->position[1] / ODOMETRY_TICKS_PER_CM),
+            this->target[2] + (theta / M_PI * 180.0)
+        };
+
+        this->pid_values[0] = this->pid_x->update(errors[0], delta);
+        this->pid_values[1] = this->pid_y->update(errors[1], delta);
+        this->pid_values[2] = this->pid_z->update(errors[2], delta);
 
         maths::vec2 rotated_pid_values{
             std::cos(-theta) * this->pid_values[0] - std::sin(-theta) * this->pid_values[1],
@@ -58,16 +64,10 @@ void Auton::runOpMode() {
         this->pid_values[1] = rotated_pid_values[1];
 
         this->robot->drivetrain->drive(maths::vec3{
-            this->pid_values[0], // forward
+            this->pid_values[1], // forward
             this->pid_values[2], // turn
-            this->pid_values[1], // strafe
+            this->pid_values[0], // strafe
         });
-
-        maths::vec3 errors{
-            this->target[0] - (this->robot->odometry->position[0] / ODOMETRY_TICKS_PER_CM),
-            this->target[1] - (this->robot->odometry->position[1] / ODOMETRY_TICKS_PER_CM),
-            this->target[2] + (theta / M_PI * 180.0)
-        };
 
         if (
             std::abs(errors[0]) < AUTON_PID_X_THRESHOLD &&
@@ -97,6 +97,8 @@ void Auton::runOpMode() {
                 node_index = (int) ((this->path.size() / 3) - 1);
             }
         }
+
+        this->telemetry->update();
     }
 }
 
@@ -108,9 +110,16 @@ void Auton::printDebugInfo() {
             this->robot->odometry->position[2] / M_PI * 180.0
     ));
 
+    this->telemetry->addLine(utils::sprintf(
+            "(target) x = %.2f; y = %.2f; θ = %.2f",
+            this->path[this->node_index * 3],
+            this->path[this->node_index * 3 + 1],
+            this->path[this->node_index * 3 + 2]
+    ));
+
     this->telemetry->addLine();
-    this->telemetry->addLine(utils::sprintf("forward_power = %.2f", this->pid_values[0]));
-    this->telemetry->addLine(utils::sprintf("strafe_power = %.2f", this->pid_values[1]));
+    this->telemetry->addLine(utils::sprintf("forward_power = %.2f", this->pid_values[1]));
+    this->telemetry->addLine(utils::sprintf("strafe_power = %.2f", this->pid_values[0]));
     this->telemetry->addLine(utils::sprintf("turn_power = %.2f", this->pid_values[2]));
 
 #ifndef PRACTICE_BOT

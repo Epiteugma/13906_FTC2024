@@ -1,4 +1,5 @@
 #include "odometry.h"
+#include <android/log.h>
 
 Odometry::Odometry(C_DcMotor *left_encoder, C_DcMotor *right_encoder, C_DcMotor *perp_encoder, double track_width, double perp_offset) {
     this->left_encoder = left_encoder;
@@ -7,6 +8,8 @@ Odometry::Odometry(C_DcMotor *left_encoder, C_DcMotor *right_encoder, C_DcMotor 
 
     this->track_width = track_width;
     this->perp_offset = perp_offset;
+
+    this->reset();
 }
 
 void Odometry::update() {
@@ -26,7 +29,7 @@ void Odometry::update() {
     this->last_encoder_values[1] = encoder_values[1];
     this->last_encoder_values[2] = encoder_values[2];
 
-    double phi = (encoder_deltas[0] - encoder_deltas[1]) / this->track_width;
+    double phi = (encoder_deltas[1] - encoder_deltas[0]) / this->track_width;
 
     maths::vec3 deltas{
         encoder_deltas[2] + this->perp_offset * phi,
@@ -36,10 +39,10 @@ void Odometry::update() {
 
     maths::mat integrator(2, 2);
 
-    integrator[0][0] = phi == 0.0 ? 1.0 : -std::sin(phi) / phi;
-    integrator[0][1] = phi == 0.0 ? 0.0 : (std::cos(phi) - 1) / phi;
-    integrator[1][0] = phi == 0.0 ? 0.0 : (-std::cos(phi) + 1) / phi;
-    integrator[1][1] = phi == 0.0 ? 1.0 : -std::sin(phi) / phi;
+    integrator[0][0] = phi == 0.0 || !this->enable_integrator ? 1.0 : std::sin(phi) / phi;
+    integrator[0][1] = phi == 0.0 || !this->enable_integrator ? 0.0 : (std::cos(phi) - 1) / phi;
+    integrator[1][0] = phi == 0.0 || !this->enable_integrator ? 0.0 : (-std::cos(phi) + 1) / phi;
+    integrator[1][1] = phi == 0.0 || !this->enable_integrator ? 1.0 : std::sin(phi) / phi;
 
     maths::vec3 integrated_deltas{
         integrator[0][0] * deltas[0] + integrator[0][1] * deltas[1],

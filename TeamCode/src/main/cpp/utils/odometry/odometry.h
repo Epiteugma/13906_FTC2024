@@ -12,6 +12,7 @@ public:
 
     double track_width;
     double perp_offset;
+    bool enable_integrator = true;
 
     Odometry(C_DcMotor *left_encoder, C_DcMotor *right_encoder, C_DcMotor *perp_encoder, double track_width, double perp_offset);
 

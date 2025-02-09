@@ -45,10 +45,15 @@ Robot::Robot(C_OpMode *op_mode) {
     this->extend_motor = op_mode->hardwareMap->getDcMotor("extend");
     this->extend_motor->setDirection(C_DcMotor::REVERSE);
 
+    this->extend_motor->setTargetPosition(EXTEND_MAX_DEGREES / -360.0 * EXTEND_TICKS_PER_REV);
+    this->extend_motor->setMode(C_DcMotor::STOP_AND_RESET_ENCODER);
+    this->extend_motor->setMode(C_DcMotor::RUN_TO_POSITION);
+
     this->rotate_servo = op_mode->hardwareMap->getServo("rotate");
     this->pickup_servo = op_mode->hardwareMap->getServo("pickup");
     this->basket_servo = op_mode->hardwareMap->getServo("basket");
 #endif
 
+    this->odometry->enable_integrator = false;
     this->odometry->reset();
 }

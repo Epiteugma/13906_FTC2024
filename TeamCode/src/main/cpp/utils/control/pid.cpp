@@ -9,7 +9,9 @@ PID::PID(double kP, double kI, double kD) {
 double PID::update(double error, std::chrono::duration<double> delta_time) {
     double p = this->coefficients[0] * error;
     double i = this->coefficients[1] * error * delta_time.count();
-    double d = this->coefficients[2] * (error - this->p_error) / delta_time.count();
+    double d = delta_time.count() != 0.0 ?
+        this->coefficients[2] * (error - this->p_error) / delta_time.count() :
+        0.0;
 
     this->p_error = error;
     this->it += i;
