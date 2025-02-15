@@ -39,9 +39,9 @@ void Drive::move_base() {
         this->gamepad1->left_stick_x(),
     });
 
-    if (this->gamepad1->left_bumper()) {
+    if (this->gamepad1->right_bumper()) {
         this->robot->drivetrain->multiplier = DRIVETRAIN_FAST_MLT;
-    } else if (this->gamepad1->right_bumper()) {
+    } else if (this->gamepad1->left_bumper()) {
         this->robot->drivetrain->multiplier = DRIVETRAIN_SLOW_MLT;
     }
 }
