@@ -87,7 +87,7 @@ void RegressorTest::runOpMode() {
             (int) (elapsed.count() * 1000) % full_phase / (double) full_phase *
             2 * M_PI
         );
-        double power = phase * 0.3;
+        double power = phase * 0.4;
 
         this->robot->drivetrain->drive(maths::vec3{power, 0.0, 0.0});
     
@@ -143,6 +143,9 @@ void RegressorTest::runOpMode() {
         row_text = row_text.substr(0, row_text.size() - 2) + "]";
         this->telemetry->addLine(row_text);
     }
+
+    this->telemetry->addLine();
+    this->telemetry->addLine(utils::sprintf("max_theoretical_velocity = %.2fms-1", (1.0 - computed[0][0]) / computed[1][0]));
 
     this->telemetry->update();
 
