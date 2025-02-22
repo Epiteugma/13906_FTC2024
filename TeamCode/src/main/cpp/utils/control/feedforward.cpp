@@ -8,7 +8,7 @@ int FeedforwardValues::get_index(double time) {
         double time_at_point = this->time_points[i];
         double distance = std::abs(time - time_at_point);
 
-        if (i == 0 || distance < min_distance) {
+        if (i == 0 || distance <= min_distance) {
             min_distance = distance;
             index = i;
         } else break;

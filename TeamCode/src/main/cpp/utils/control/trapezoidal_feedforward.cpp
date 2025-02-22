@@ -43,30 +43,30 @@ FeedforwardValues TrapezoidalFeedforward::calculate(maths::vec3 end, maths::vec3
     double total_time = 2 * time_to_max_path_velocity + time_at_max_velocity;
 
     for (int i = 0; i < this->num_steps; i++) {
-        double timestamp = (double) i / (double) this->num_steps * total_time;
-        values.time_points.push_back(timestamp);
+        double timestamp = (double) (i + 1) / (double) this->num_steps * total_time;
+        values.time_points[i] = timestamp;
 
         double distance_covered;
 
         if (timestamp < time_to_max_path_velocity) {
-            values.velocities.push_back(timestamp / time_to_max_path_velocity * max_path_velocity);
+            values.velocities[i] = timestamp / time_to_max_path_velocity * max_path_velocity;
             distance_covered = values.velocities[i] * timestamp * 0.5;
         } else if (timestamp < decel_timestamp) {
-            values.velocities.push_back(max_path_velocity);
+            values.velocities[i] = max_path_velocity;
             distance_covered = (max_path_velocity * time_to_max_path_velocity * 0.5) + (decel_timestamp - time_to_max_path_velocity) * max_path_velocity;
         } else {
             double decel_time = timestamp - decel_timestamp;
             double remaining_decel_progress = 1 - (decel_time / time_to_max_path_velocity);
             double remaining_distance = (remaining_decel_progress * max_path_velocity) * (remaining_decel_progress * time_to_max_path_velocity) * 0.5;
 
-            values.velocities.push_back((1 - decel_time / time_to_max_path_velocity) * max_path_velocity);
+            values.velocities[i] = (1 - decel_time / time_to_max_path_velocity) * max_path_velocity;
             distance_covered = distance_to_travel - remaining_distance;
         }
 
         // TODO: integrate
-        values.displacements.push_back(start[0] + distance_covered * std::cos(dir_angle));
-        values.displacements.push_back(start[1] + distance_to_travel * std::sin(dir_angle));
-        values.displacements.push_back(start[2] + dir[2] * timestamp / total_time);
+        values.displacements[i * 3] = start[0] + distance_covered * std::cos(dir_angle);
+        values.displacements[i * 3 + 1] = start[1] + distance_to_travel * std::sin(dir_angle);
+        values.displacements[i * 3 + 2] = start[2] + dir[2] * timestamp / total_time;
     }
 
     return values;

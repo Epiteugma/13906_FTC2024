@@ -6,8 +6,9 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_RegressorTest
 }
 
 void RegressorTest::runOpMode() {
-    this->robot = new Robot(this);
+    bool button_lock = false;
 
+    this->robot = new Robot(this);
     this->waitForStart();
 
     maths::vec3 velocity{};
@@ -144,9 +145,68 @@ void RegressorTest::runOpMode() {
         this->telemetry->addLine(row_text);
     }
 
-    this->telemetry->addLine();
-    this->telemetry->addLine(utils::sprintf("max_theoretical_velocity = %.2fms-1", (1.0 - computed[0][0]) / computed[1][0]));
+    double theoretical_max_velocity = (1.0 - computed[0][0]) / computed[1][0];
 
+    this->telemetry->addLine();
+    this->telemetry->addLine(utils::sprintf("max_theoretical_velocity = %.2fms-1", theoretical_max_velocity));
+
+    this->telemetry->update();
+    button_lock = true;
+
+    while (this->opModeIsActive()) {
+        if (this->gamepad1->a() && !button_lock) break;
+        button_lock = this->gamepad1->a();
+    }
+
+    start = std::chrono::system_clock::now();
+    last = start;
+    button_lock = true;
+
+    this->robot->odometry->update();
+    last_position[0] = this->robot->odometry->position[0];
+    last_position[1] = this->robot->odometry->position[1];
+    last_position[2] = this->robot->odometry->position[2];
+
+    double velocity_magnitude = 0.0;
+
+    while (this->opModeIsActive() && !(this->gamepad1->a() && !button_lock)) {
+        button_lock = this->gamepad1->a();
+
+        auto now = std::chrono::system_clock::now();
+        this->robot->odometry->update();
+
+        elapsed = now - start;
+        std::chrono::duration<double> delta = now - last;
+
+        last = now;
+
+        velocity[0] = (this->robot->odometry->position[0] - last_position[0]) / delta.count();
+        velocity[1] = (this->robot->odometry->position[1] - last_position[1]) / delta.count();
+        velocity[2] = (this->robot->odometry->position[2] - last_position[2]) / delta.count();
+
+        last_position[0] = this->robot->odometry->position[0];
+        last_position[1] = this->robot->odometry->position[1];
+        last_position[2] = this->robot->odometry->position[2];
+
+        this->robot->drivetrain->drive(maths::vec3{1.0, 0.0, 0.0});
+
+        velocity_magnitude = std::hypot(
+            velocity[0] / (ODOMETRY_TICKS_PER_CM * 100.0),
+            velocity[1] / (ODOMETRY_TICKS_PER_CM * 100.0)
+        );
+
+        if (std::abs(velocity_magnitude - theoretical_max_velocity * 0.5) < 0.01) {
+            break;
+        }
+
+        this->telemetry->addLine(utils::sprintf("velocity magnitude = %.2fms-1", velocity_magnitude));
+        this->telemetry->update();
+    }
+
+    this->robot->drivetrain->drive(maths::vec3{0.0, 0.0, 0.0});
+
+    this->telemetry->addLine(utils::sprintf("velocity magnitude = %.2fms-1", velocity_magnitude));
+    this->telemetry->addLine(utils::sprintf("time_to_max_velocity = %.2fs", elapsed.count() / 0.5));
     this->telemetry->update();
 
     while (this->opModeIsActive()) { /* HALT */ }
