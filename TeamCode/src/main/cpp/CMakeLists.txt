@@ -17,10 +17,13 @@ add_library(teamcode SHARED
         utils/kinematics/drivetrain.cpp
         utils/odometry/odometry.cpp
         utils/control/pid.cpp
+        utils/control/feedforward.cpp
+        utils/control/trapezoidal_feedforward.cpp
 
         opmodes/drive.cpp
         opmodes/servo_tuner.cpp
         opmodes/regressor_test.cpp
+        opmodes/feedforward_test.cpp
 
         opmodes/auton.cpp
         opmodes/auton_place.cpp
