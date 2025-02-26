@@ -3,18 +3,27 @@
 extern "C"
 JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_runOpMode(JNIEnv *p_jni, jobject self) {
     std::vector<double> path = {
-        -30.0, -60.0, 0.0,
-        -30.0, -60.0, -45.0,
-        -10.0, -70.0, -45.0,
+        -35.0, -60.0, 0.0,
+        -35.0, -60.0, -45.0,
+        -5.0, -65.0, -45.0, // score block 1
         -20.0, -50.0, -45.0,
-        -20.0, -50.0, -180.0,
-        -30.0, -5.0, -180.0,
-        -83.0, -5.0, -180.0,
-        -83.0, -18.0, -180.0,
-        -83.0, -18.0, -45.0,
-        -30.0, -65.0, -45.0,
-        -0.0, -65.0, -45.0,
-        -0.0, -40.0, -45.0,
+        -20.0, -50.0, -167.0,
+        -20.0, -50.0, -167.0,
+        -20.0, -0.5, -167.0,
+        -77, 2, -167.0,
+        -77, -10.0, -167.0,
+        -40.0, -60.0, -167.0,
+        -40.0, -60.0, -40.0,
+        -5.0, -67.0, -40.0, // score block 2
+        -40.0, -60.0, -40.0,
+        -40.0, -60.0, -175.0,
+        -40.0, -10.0, -170.0,
+        -80.0, -10.0, -170.0,
+        -83.0, -42, -170.0,
+        -40.0, -60.0, -175.0,
+        -40.0, -60.0, -40.0,
+        -5.0, -67.0, -40.0,
+        -40.0, -60.0, -40.0,
     };
 
 #ifndef PRACTICE_BOT
@@ -81,7 +90,7 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
 
         std::chrono::duration<double> basket_delta = std::chrono::high_resolution_clock::now() - timer;
 
-        if (basket_delta.count() > 1.0) {
+        if (basket_delta.count() > 0.50) {
             action.done = true;
             timer = std::chrono::high_resolution_clock::time_point();
         }
@@ -110,7 +119,7 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         p_auton->robot->pickup_servo->setPosition(PICKUP_SERVO_CLOSED);
         std::chrono::duration<double> delta = std::chrono::high_resolution_clock::now() - timer;
 
-        if (delta.count() > 1.0) {
+        if (delta.count() > 0.80) {
             action.done = true;
             timer = std::chrono::high_resolution_clock::time_point();
         }
@@ -163,13 +172,20 @@ JNIEXPORT void JNICALL Java_org_firstinspires_ftc_teamcode_opmodes_AutonPlace_ru
         {1, extend_lift, "extend lift"},
         {2, place_block, "place block"},
         {3, retract_lift, "retract lift"},
-        {6, rotate_to_block, "rtb"},
-        {7, pickup_block, "pb"},
-        {7, rotate_to_basket, "rtb"},
-        {7, release_block, "rb"},
-        {9, extend_lift, "extend"},
-        {10, place_block, "place"},
-        {11, retract_lift, "rb"},
+        {7, rotate_to_block, "rtb"},
+        {8, pickup_block, "pb"},
+        {8, rotate_to_basket, "rtb"},
+        {8, release_block, "rb"},
+        {10, extend_lift, "extend"},
+        {11, place_block, "place"},
+        {12, retract_lift, "rb"},
+        {15, rotate_to_block, "rtb"},
+        {16, pickup_block, "pb"},
+        {16, rotate_to_basket, "rtb"},
+        {16, release_block, "rb"},
+        {18, extend_lift, "extend"},
+        {19, place_block, "place"},
+        {20, retract_lift, "rb"},
 #endif
     };
 
