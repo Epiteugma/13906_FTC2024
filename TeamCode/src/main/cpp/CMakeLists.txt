@@ -26,7 +26,8 @@ add_library(teamcode SHARED
         opmodes/feedforward_test.cpp
 
         opmodes/auton.cpp
-        opmodes/auton_place.cpp
+        opmodes/auton_placeRed.cpp
+        opmodes/auton_placeBlue.cpp
         opmodes/auton_park.cpp
 
         robot.cpp

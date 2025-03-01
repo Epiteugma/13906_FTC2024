@@ -11,9 +11,6 @@ void Drivetrain::drive(maths::vec3 power) const {
     double direction = std::atan2(power[0], power[2]);
     double magnitude = std::hypot(power[0], power[2]);
 
-    magnitude -= std::abs(power[1]);
-    if (magnitude < 0.0) magnitude = 0.0;
-
     magnitude *= this->multiplier;
 
     maths::vec3 motor_powers{

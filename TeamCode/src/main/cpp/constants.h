@@ -47,7 +47,7 @@
 #define LIFT_UP_MLT     1.0
 #define LIFT_DOWN_MLT   0.75
 
-#define LIFT_UP_POSITION   45.0
+#define LIFT_UP_POSITION   50.0
 #define LIFT_TICKS_PER_REV (28.0 * 25.0)
 #define LIFT_GEAR_RADIUS   2.0
 #define LIFT_TICKS_PER_CM  (LIFT_TICKS_PER_REV / (2 * M_PI * LIFT_GEAR_RADIUS))
