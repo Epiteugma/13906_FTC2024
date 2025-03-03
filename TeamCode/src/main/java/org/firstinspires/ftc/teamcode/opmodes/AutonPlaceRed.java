@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.auton.AutonAction;
 import org.firstinspires.ftc.teamcode.utils.PID;
 import org.firstinspires.ftc.teamcode.utils.maths.Vec3;
 
-@Autonomous(name = "[FTC24] Place RED")
+@Autonomous(name = "[FTC24] Place Red")
 public class AutonPlaceRed extends LinearOpMode {
 
     @Override

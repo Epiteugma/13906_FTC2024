@@ -40,8 +40,8 @@ public class Actions {
         auton.robot.lift1.setPower(Constants.LIFT_UP_MLT);
         auton.robot.lift2.setPower(Constants.LIFT_UP_MLT);
 
-        double lift1Err = Math.abs(Constants.LIFT_UP_POSITION - auton.robot.lift1.getCurrentPosition()) / Constants.LIFT_TICKS_PER_CM;
-        double lift2Err = Math.abs(Constants.LIFT_UP_POSITION - auton.robot.lift2.getCurrentPosition()) / Constants.LIFT_TICKS_PER_CM;
+        double lift1Err = Math.abs(Constants.LIFT_UP_POSITION - auton.robot.lift1.getCurrentPosition() / Constants.LIFT_TICKS_PER_CM);
+        double lift2Err = Math.abs(Constants.LIFT_UP_POSITION - auton.robot.lift2.getCurrentPosition() / Constants.LIFT_TICKS_PER_CM);
 
         double liftErr = (lift1Err + lift2Err) / 2;
 
@@ -64,8 +64,8 @@ public class Actions {
 
         auton.robot.basketServo.setPosition(Constants.BASKET_SERVO_COLLECT);
 
-        double lift1Err = Math.abs(auton.robot.lift1.getCurrentPosition()) / Constants.LIFT_TICKS_PER_CM;
-        double lift2Err = Math.abs(auton.robot.lift2.getCurrentPosition()) / Constants.LIFT_TICKS_PER_CM;
+        double lift1Err = Math.abs(auton.robot.lift1.getCurrentPosition() / Constants.LIFT_TICKS_PER_CM);
+        double lift2Err = Math.abs(auton.robot.lift2.getCurrentPosition() / Constants.LIFT_TICKS_PER_CM);
 
         double liftErr = (lift1Err + lift2Err) / 2;
 
