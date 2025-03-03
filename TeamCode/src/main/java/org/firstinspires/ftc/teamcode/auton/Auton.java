@@ -60,8 +60,8 @@ public class Auton {
             this.pidValues.rotate(-this.robot.odometry.position.z, Axis.Z);
 
             this.robot.drivetrain.drive(
-                    this.pidValues.x,
                     this.pidValues.y,
+                    this.pidValues.x,
                     this.pidValues.z
             );
 
@@ -114,8 +114,8 @@ public class Auton {
 
         this.opMode.telemetry.addLine();
 
-        this.opMode.telemetry.addLine(String.format(Locale.getDefault(), "forward_power = %.2f", this.pidValues.x));
-        this.opMode.telemetry.addLine(String.format(Locale.getDefault(), "strafe_power = %.2f", this.pidValues.y));
+        this.opMode.telemetry.addLine(String.format(Locale.getDefault(), "forward_power = %.2f", this.pidValues.y));
+        this.opMode.telemetry.addLine(String.format(Locale.getDefault(), "strafe_power = %.2f", this.pidValues.x));
         this.opMode.telemetry.addLine(String.format(Locale.getDefault(), "turn_power = %.2f", this.pidValues.z));
 
         this.opMode.telemetry.addLine();
