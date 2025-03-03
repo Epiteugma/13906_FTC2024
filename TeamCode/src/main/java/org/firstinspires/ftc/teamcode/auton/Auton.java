@@ -14,7 +14,7 @@ public class Auton {
     LinearOpMode opMode;
 
     public Robot robot;
-    Vec3 target;
+    Vec3 target = new Vec3(0, 0, 0);
 
     int nodeIndex = 0;
     int actionIndex = -1;
