@@ -59,6 +59,18 @@ The readme.md file located in the [/TeamCode/src/main/java/org/firstinspires/ftc
 
 # Release Information
 
+## Version 10.2 (20250121-174034)
+
+### Enhancements
+* Add ability to upload the pipeline for Limelight3A which allows teams to version control their limelight pipelines.
+
+
+### Bug Fixes
+
+* Fix an internal bug where if the RUN_TO_POSITION run mode was specified before a target position, recovery would require a power cycle. A side effect of this fix is that a stack trace identifying the location of the error is always produced in the log. Fixes issue [1345](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1345).
+* Throws a helpful exception if region of interest is set to null when building a PredominantColorProcessor. Also sets the default RoI to the full frame. Addresses issue [1076](FIRST-Tech-Challenge/FtcRobotController#1076)
+* Throws a helpful exception if user tries to construct an ImageRegion with malformed boundaries.  Addresses issue [1078](FIRST-Tech-Challenge/FtcRobotController#1078)
+
 ## Version 10.1.1 (20241102-092223)
 
 ### Breaking Changes
@@ -295,7 +307,7 @@ The readme.md file located in the [/TeamCode/src/main/java/org/firstinspires/ftc
     * [AprilTag Introduction](https://ftc-docs.firstinspires.org/apriltag-intro)
     * [AprilTag SDK Guide](https://ftc-docs.firstinspires.org/apriltag-sdk)
     * [AprilTag Detection Values](https://ftc-docs.firstinspires.org/apriltag-detection-values)
-    * [AprilTag RegressorTest Images](https://ftc-docs.firstinspires.org/apriltag-test-images)
+    * [AprilTag Test Images](https://ftc-docs.firstinspires.org/apriltag-test-images)
     * [Camera Calibration](https://ftc-docs.firstinspires.org/camera-calibration)
 * Adds Driver Station support for Logitech Dual Action and Sony PS5 DualSense gamepads.
     * This **does not** include support for the Sony PS5 DualSense Edge gamepad.
@@ -350,7 +362,7 @@ This is a bug fix only release to address the following four issues.
   * You can determine which type of IMU is in your Control Hub by navigating to the Manage page of the web interface.
   * To learn how to use the new `IMU` interface, see https://ftc-docs.firstinspires.org/programming_resources/imu/imu.html. The `SensorIMU` Blocks sample was also updated to use the new `IMU` interface, and the following Java samples were added:
     * `SensorIMUOrthogonal`
-      * Use this sample if your REV Hub is mounted so that it is perp or perpendicular to the
+      * Use this sample if your REV Hub is mounted so that it is parallel or perpendicular to the
         bottom of your robot.
     * `SensorIMUNonOrthogonal`
       * Use this sample if your REV Hub is mounted to your robot in any other orientation
@@ -603,7 +615,7 @@ This is a bug fix only release to address the following four issues.
 * Fixes issue where the Control Hub OS's watchdog would restart the Robot Controller app if
   the Control Hub was not able to communicate with its internal Expansion Hub
 * Fixes certain I2C devices not showing up in the appropriate `HardwareMap` fields (such as `hardwareMap.colorSensor`)
-* Fixes issue where performing a Wi-Fi factory init on the Control Hub would not set the Wi-Fi band to 2.4 GHz
+* Fixes issue where performing a Wi-Fi factory reset on the Control Hub would not set the Wi-Fi band to 2.4 GHz
 * Fixes issue where OnBotJava might fail to create a new file if the option to "Setup Code for Configured Hardware" was selected
 * Fixes issue where performing certain operations after an OpMode crashes would temporarily break Control/Expansion Hub communication
 * Fixes issue where a Control Hub with a configured USB-connected Expansion Hub would not work if the Expansion Hub was missing at startup
@@ -1018,9 +1030,9 @@ Changes include:
 	+ Robot Controller app should be able to install the firmware onto the Hub, even if if accidentally was bricked in a previous update attempt.
 
  * Resiliency
-    - FTC software can detect and enable an FTDI init feature that is available with REV Robotics v1.8 Expansion Hub firmware and greater.
+    - FTC software can detect and enable an FTDI reset feature that is available with REV Robotics v1.8 Expansion Hub firmware and greater.
         + When enabled, the Expansion Hub can detect if it hasn't communicated with the Robot Controller over the FTDI (USB) connection.
-	+ If the Hub hasn't heard from the Robot Controller in a while, it will init the FTDI connection.
+	+ If the Hub hasn't heard from the Robot Controller in a while, it will reset the FTDI connection.
 	+ This action helps system recover from some ESD-induced disruptions.
     - Various fixes to improve reliability of FTC software.
 
@@ -1227,7 +1239,7 @@ Please note, however, that version 3.00 is considered "alpha" code.  This code i
 
 Changes include:
  * Major rework of sensor-related infrastructure.  Includes rewriting sensor classes to implement synchronous I2C communication.
- * Fix to init Autonomous timer back to 30 seconds.
+ * Fix to reset Autonomous timer back to 30 seconds.
  * Implementation of specific motor profiles for approved 12V motors (includes Tetrix, AndyMark, Matrix and REV models).
  * Modest improvements to enhance Wi-Fi P2P pairing.
  * Fixes telemetry log addition race.
@@ -1389,7 +1401,7 @@ Changes include:
 ## Version 2.10 (released on 16.09.03)
  * Support for Adafruit IMU.
  * Improvements to ModernRoboticsI2cGyro class
-    - Block on init of z axis.
+    - Block on reset of z axis.
     - isCalibrating() returns true while gyro is calibration.
  * Updated sample gyro program.
  * Blockly enhancements
@@ -1452,7 +1464,7 @@ Changes include:
     - runOpMode() (for a LinearOpMode) is now decoupled from the system's hardware read/write thread.
     - loop() (for an OpMode) is now decoupled from the system's hardware read/write thread.
     - Methods are synchronous.
-    - For example, if you call setMode(DcMotorController.RunMode.RESET_ENCODERS) for a motor, the encoder is guaranteed to be init when the method call is complete.
+    - For example, if you call setMode(DcMotorController.RunMode.RESET_ENCODERS) for a motor, the encoder is guaranteed to be reset when the method call is complete.
     - For legacy module (NXT compatible), user no longer has to toggle between read and write modes when reading from or writing to a legacy device.
  * Changes made to enhance reliability/robustness during ESD event.
  * Changes made to make code thread safe.
@@ -1513,7 +1525,7 @@ Changes include:
  * Fix for "missing hardware leaves robot controller disconnected from driver station" error
  * fix for "fast tapping of Init/Start causes problems" (toast is now only instantiated on UI thread).
  * added some log statements for thread life cycle.
- * moved gamepad init logic inside of initActiveOpMode() for robustness
+ * moved gamepad reset logic inside of initActiveOpMode() for robustness
  * changes made to mitigate risk of race conditions on public methods.
  * changes to try and flag when Wi-Fi Direct name contains non-printable characters.
  * fix to correct race condition between .run() and .close() in ReadWriteRunnableStandard.

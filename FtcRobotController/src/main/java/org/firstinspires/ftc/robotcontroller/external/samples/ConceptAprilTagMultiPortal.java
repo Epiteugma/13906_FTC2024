@@ -92,7 +92,7 @@ public class ConceptAprilTagMultiPortal extends LinearOpMode
         // Main Loop
         while (opModeIsActive())
         {
-            // Just show some basic telemetry to demonstrate both processors are working in perp
+            // Just show some basic telemetry to demonstrate both processors are working in parallel
             // on their respective cameras. If you want to see more detail about the information you
             // can get back from the processor, you should look at ConceptAprilTag.
             telemetry.addData("Number of tags in Camera 1", aprilTagProcessor1.getDetections().size());

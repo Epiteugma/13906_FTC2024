@@ -104,7 +104,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Send telemetry message to indicate successful Encoder init
+        // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Starting at",  "%7d :%7d",
                           leftDrive.getCurrentPosition(),
                           rightDrive.getCurrentPosition());
@@ -126,7 +126,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     /*
      *  Method to perform a relative move, based on encoder counts.
-     *  Encoders are not init as the move is based on the current position.
+     *  Encoders are not reset as the move is based on the current position.
      *  Move will stop if any of three conditions occur:
      *  1) Move gets to the desired position
      *  2) Move runs out of time
@@ -151,7 +151,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
             leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // init the timeout time and start motion.
+            // reset the timeout time and start motion.
             runtime.reset();
             leftDrive.setPower(Math.abs(speed));
             rightDrive.setPower(Math.abs(speed));

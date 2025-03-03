@@ -21,6 +21,8 @@ apply plugin: 'com.android.application'
 
 android {
 
+    compileSdkVersion 30
+
     signingConfigs {
         release {
             def apkStoreFile = System.getenv("APK_SIGNING_STORE_FILE")
@@ -107,7 +109,7 @@ android {
     packagingOptions {
         pickFirst '**/*.so'
     }
-    ndkVersion '27.0.12077973'
+    ndkVersion '21.3.6528147'
 }
 
 repositories {

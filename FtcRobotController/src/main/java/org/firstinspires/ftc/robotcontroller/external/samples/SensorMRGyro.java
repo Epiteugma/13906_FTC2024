@@ -99,12 +99,12 @@ public class SensorMRGyro extends LinearOpMode {
     // Wait for the start button to be pressed
     waitForStart();
     telemetry.log().clear();
-    telemetry.log().add("Press A & B to init heading");
+    telemetry.log().add("Press A & B to reset heading");
 
     // Loop until we're asked to stop
     while (opModeIsActive())  {
 
-      // If the A and B buttons are pressed just now, init Z heading.
+      // If the A and B buttons are pressed just now, reset Z heading.
       curResetState = (gamepad1.a && gamepad1.b);
       if (curResetState && !lastResetState) {
         modernRoboticsI2cGyro.resetZAxisIntegrator();
