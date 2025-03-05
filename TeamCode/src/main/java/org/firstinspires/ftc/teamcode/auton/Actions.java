@@ -59,8 +59,8 @@ public class Actions {
         auton.robot.lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         auton.robot.lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        auton.robot.lift1.setPower(Constants.LIFT_UP_MLT);
-        auton.robot.lift2.setPower(Constants.LIFT_UP_MLT);
+        auton.robot.lift1.setPower(-1);
+        auton.robot.lift2.setPower(-1);
 
         auton.robot.basketServo.setPosition(Constants.BASKET_SERVO_COLLECT);
 
@@ -73,7 +73,7 @@ public class Actions {
         auton.opMode.telemetry.addLine(String.format(Locale.getDefault(), "lift_2_err = %.2f", lift2Err));
         auton.opMode.telemetry.addLine(String.format(Locale.getDefault(), "lift_err = %.2f", liftErr));
 
-        if (liftErr < 5.0) action.done = true;
+        if (liftErr < 10.0) action.done = true;
     };
 
     public static final AutonAction.ActionRuner placeBlock = (action, auton) -> {
@@ -87,7 +87,7 @@ public class Actions {
 
         auton.robot.basketServo.setPosition(Constants.BASKET_SERVO_SCORE);
 
-        if (System.currentTimeMillis() - timer > 500) {
+        if (System.currentTimeMillis() - timer > 800) {
             timer = 0;
             action.done = true;
         }

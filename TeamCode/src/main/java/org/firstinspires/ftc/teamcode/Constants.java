@@ -33,7 +33,7 @@ public class Constants {
     public static final double LIFT_UP_MLT = 1.0;
     public static final double LIFT_DOWN_MLT = 0.75;
 
-    public static final double LIFT_UP_POSITION = 50.0;
+    public static final double LIFT_UP_POSITION = 45.0;
     public static final double LIFT_TICKS_PER_REV = 28.0 * 25.0;
     public static final double LIFT_GEAR_RADIUS = 2.0;
     public static final double LIFT_TICKS_PER_CM = LIFT_TICKS_PER_REV / (2 * Math.PI * LIFT_GEAR_RADIUS);

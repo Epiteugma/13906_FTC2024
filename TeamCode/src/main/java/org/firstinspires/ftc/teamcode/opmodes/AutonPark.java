@@ -29,7 +29,7 @@ public class AutonPark extends LinearOpMode {
 
         auton.pidX = new PID(1 / 20.0, 0, 0);
         auton.pidY = new PID(1 / 20.0, 0, 0);
-        auton.pidZ = new PID(1 / 20.0, 0, 0);
+        auton.pidZ = new PID(1 / 15.0, 0, 0);
 
         auton.runOpMode();
     }
